@@ -10,7 +10,7 @@ import java.io.OutputStream;
 
 public class BluetoothSerial implements BTConnector.OnConnectedListener {
 
-    private final String TAG = "BluetoothSerial";
+    private static final String TAG = "BluetoothSerial";
     private static final byte ASCII_NEWLINE = 10;
     private BluetoothSocket socket;
     private OutputStream outputStream;
@@ -34,6 +34,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
             this.outputStream = bluetoothSocket.getOutputStream();
             dataListener = new DataListener(bluetoothSocket.getInputStream());
             Thread dataReceiverThread = new Thread(dataListener);
+            dataReceiverThread.start();
             this.socket = bluetoothSocket;
             Log.i(TAG,"Succesfully connected");
             communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_SUCCESS);
@@ -93,7 +94,8 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
     }
 
     private class DataListener implements Runnable {
-        private boolean running = false;
+        private static final String TAG = "DataListener";
+        private boolean running = true;
         private InputStream inputStream;
         private byte[] readBuffer;
         private String data;
@@ -107,11 +109,13 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         public void run() {
             readBuffer = new byte[1024];
             int readBufferPosition = 0;
+            Log.d(TAG, "Entering loop...");
             //Loop
             while (isRunning() && !Thread.currentThread().isInterrupted()) {
                 try {
                     int bytesAvailable = inputStream.available();
                     if(bytesAvailable > 0) {
+                        Log.d(TAG,"New bytes available");
                         byte[] receivedPacket = new byte[bytesAvailable];
                         inputStream.read(receivedPacket);
                         for (int i = 0; i < receivedPacket.length; i++) {
@@ -131,7 +135,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                    running = false;
+                    BluetoothSerial.this.close();
                     inputException = e;
                 }
                 catch (ArrayIndexOutOfBoundsException e) {
@@ -141,6 +145,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
             //Quando abbiamo finito
             try {
                 inputStream.close();
+                BluetoothSerial.this.close();
             }
             catch (IOException e) {
                 e.printStackTrace();
