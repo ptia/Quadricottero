@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Set;
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
     MenuItem connectMenu;
     Button sendButton;
     EditText sendText;
+    TextView receivedTextView;
+    ScrollView scroller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +37,12 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         sendButton = (Button) findViewById(R.id.send_button);
         sendText = (EditText) findViewById(R.id.send_message_edittext);
+        receivedTextView = (TextView) findViewById(R.id.received_text_view);
+        scroller = (ScrollView) findViewById(R.id.received_text_scroller);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bluetoothSerial.print(sendText.getText().toString());
-                //Toast.makeText(MainActivity.this,bluetoothSerial.readString() ,Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
                     "Connessione con " +bluetoothSerial.getDevice().getName()+" fallita",
                     Toast.LENGTH_SHORT).show();
         }
-        else if(communication == OUTPUT_ERROR) {
+        else if (communication == OUTPUT_ERROR) {
             bluetoothSerial.close();
         }
         else if (communication == CONNECTION_CLOSED) {
@@ -65,6 +70,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             sendText.setEnabled(false);
             Toast.makeText(this,"Disconnesso",Toast.LENGTH_SHORT).show();
             setTitle("Quadricottero");
+        }
+        else if (communication == INCOMING_DATA) {
+            receivedTextView.append(bluetoothSerial.readString()+"\n");
+            scrollToBottom();
         }
     }
 
@@ -99,6 +108,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             }
         });
         builder.create().show();
+    }
+
+    private void scrollToBottom()
+    {
+        scroller.post(new Runnable()
+        {
+            public void run()
+            {
+                scroller.smoothScrollTo(0, receivedTextView.getBottom());
+            }
+        });
     }
 
     @Override

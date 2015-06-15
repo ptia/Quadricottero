@@ -7,9 +7,11 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Handler;
 
 public class BTConnector extends AsyncTask<BluetoothDevice, Void, BluetoothSocket>{
     OnConnectedListener listener;
+    Handler newDataHandler;
     public BTConnector(OnConnectedListener listener) {
         this.listener = listener;
     }

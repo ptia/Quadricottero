@@ -2,7 +2,9 @@ package it.ptia.quadricottero;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,11 +97,13 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
 
     private class DataListener implements Runnable {
         private static final String TAG = "DataListener";
+        final Handler handler = new Handler();
         private boolean running = true;
         private InputStream inputStream;
         private byte[] readBuffer;
         private String data;
         private IOException inputException = null;
+        CommunicationReceiver communicationReceiver;
 
         public DataListener(InputStream inputStream) {
             this.inputStream = inputStream;
@@ -107,6 +111,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
 
         @Override
         public void run() {
+            communicationReceiver = BluetoothSerial.this.communicationReceiver;
             readBuffer = new byte[1024];
             int readBufferPosition = 0;
             Log.d(TAG, "Entering loop...");
@@ -115,7 +120,6 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
                 try {
                     int bytesAvailable = inputStream.available();
                     if(bytesAvailable > 0) {
-                        Log.d(TAG,"New bytes available");
                         byte[] receivedPacket = new byte[bytesAvailable];
                         inputStream.read(receivedPacket);
                         for (int i = 0; i < receivedPacket.length; i++) {
@@ -125,6 +129,13 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
                                 System.arraycopy(readBuffer, 0, encodedBytes, 0,encodedBytes.length);
                                 data = new String(encodedBytes, "US-ASCII");
                                 readBufferPosition = 0;
+                                Log.i(TAG, "new string: " + data);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        communicationReceiver.onNewCommunicationReceived(Communication.INCOMING_DATA);
+                                    }
+                                });
                             }
                             else {
                                 readBuffer[readBufferPosition++] = b;
@@ -135,8 +146,13 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                    BluetoothSerial.this.close();
                     inputException = e;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            BluetoothSerial.this.close();
+                        }
+                    });
                 }
                 catch (ArrayIndexOutOfBoundsException e) {
                     readBufferPosition = 0;
@@ -145,7 +161,12 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
             //Quando abbiamo finito
             try {
                 inputStream.close();
-                BluetoothSerial.this.close();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        BluetoothSerial.this.close();
+                    }
+                });
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -173,6 +194,6 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         void onNewCommunicationReceived(Communication communication);
     }
     public enum Communication {
-        CONNECTION_SUCCESS, CONNECTION_ERROR, INPUT_ERROR, OUTPUT_ERROR, CONNECTION_CLOSED
+        CONNECTION_SUCCESS, CONNECTION_ERROR, INPUT_ERROR, OUTPUT_ERROR, CONNECTION_CLOSED, INCOMING_DATA
     }
 }
