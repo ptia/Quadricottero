@@ -3,7 +3,7 @@
 Quadricottero is an Arduino-based quadcopter flight controller. 
 Its main features are:
 * Acrobatic and stabilized flight mode
-* Serial (BlueTooth) settings manager for enabling log, changing PID constants, and so on
+* Serial (bluetooth) settings manager for enabling log, changing PID constants, and so on
 * EEPROM saved PID constants
 * Time-saving, interrupt-driven radio reading
 * Some basic safety features
