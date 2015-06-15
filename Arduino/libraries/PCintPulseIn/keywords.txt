@@ -1,0 +1,2 @@
+PCintPulseIn	KEYWORD2
+attachPulseIn	KEYWORD2
