@@ -11,26 +11,15 @@ import java.io.OutputStream;
 public class BluetoothSerial implements BTConnector.OnConnectedListener {
 
     private final String TAG = "BluetoothSerial";
+    private static final byte ASCII_NEWLINE = 10;
     private BluetoothSocket socket;
     private OutputStream outputStream;
-    private InputStream inputStream;
+    private DataListener dataListener;
     private BluetoothDevice device;
-    private Communicator communicator;
+    private CommunicationReceiver communicationReceiver;
 
-    public BluetoothSerial(Communicator communicator) {
-        this.communicator = communicator;
-    }
-    public boolean isConnected() {
-        try {
-            return socket.isConnected();
-        }
-        catch (Exception e) {
-            return false;
-        }
-    }
-
-    public BluetoothDevice getDevice() {
-        return device;
+    public BluetoothSerial(CommunicationReceiver communicator) {
+        this.communicationReceiver = communicator;
     }
 
     public void begin(BluetoothDevice device) {
@@ -39,12 +28,29 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         connector.execute(device);
     }
 
+    @Override
+    public void onConnected(BluetoothSocket bluetoothSocket) {
+        try {
+            this.outputStream = bluetoothSocket.getOutputStream();
+            dataListener = new DataListener(bluetoothSocket.getInputStream());
+            Thread dataReceiverThread = new Thread(dataListener);
+            this.socket = bluetoothSocket;
+            Log.i(TAG,"Succesfully connected");
+            communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_SUCCESS);
+        }
+        catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Can't connect");
+            communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_ERROR);
+        }
+    }
+
     public void close() {
         try {
             outputStream.close();
-            inputStream.close();
             socket.close();
-            communicator.communicate(Communication.CONNECTION_CLOSED);
+            dataListener.setRunning(false);
+            communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_CLOSED);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,49 +64,108 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         }
         catch (IOException | NullPointerException e) {
             e.printStackTrace();
-            communicator.communicate(Communication.OUTPUT_ERROR);
+            communicationReceiver.onNewCommunicationReceived(Communication.OUTPUT_ERROR);
         }
 
     }
 
-    @Override
-    public void onConnected(BluetoothSocket bluetoothSocket) {
+    public String readString() {
+        if(dataListener.getInputException() == null) {
+            return dataListener.getData();
+        }
+        else {
+            communicationReceiver.onNewCommunicationReceived(Communication.INPUT_ERROR);
+            return null;
+        }
+    }
+
+    public boolean isConnected() {
         try {
-            this.outputStream = bluetoothSocket.getOutputStream();
-            this.inputStream = bluetoothSocket.getInputStream();
-            this.socket = bluetoothSocket;
-            Log.i(TAG,"Succesfully connected");
-            communicator.communicate(Communication.CONNECTION_SUCCESS);
+            return socket.isConnected() && dataListener.isRunning();
         }
-        catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Can't connect");
-            communicator.communicate(Communication.CONNECTION_ERROR);
+        catch (Exception e) {
+            return false;
         }
+    }
+
+    public BluetoothDevice getDevice() {
+        return device;
     }
 
     private class DataListener implements Runnable {
         private boolean running = false;
+        private InputStream inputStream;
+        private byte[] readBuffer;
+        private String data;
+        private IOException inputException = null;
+
+        public DataListener(InputStream inputStream) {
+            this.inputStream = inputStream;
+        }
 
         @Override
         public void run() {
+            readBuffer = new byte[1024];
+            int readBufferPosition = 0;
             //Loop
-            while (running && !Thread.currentThread().isInterrupted()) {
-
+            while (isRunning() && !Thread.currentThread().isInterrupted()) {
+                try {
+                    int bytesAvailable = inputStream.available();
+                    if(bytesAvailable > 0) {
+                        byte[] receivedPacket = new byte[bytesAvailable];
+                        inputStream.read(receivedPacket);
+                        for (int i = 0; i < receivedPacket.length; i++) {
+                            byte b = receivedPacket[i];
+                            if(b==ASCII_NEWLINE) {
+                                byte[] encodedBytes = new byte[readBufferPosition];
+                                System.arraycopy(readBuffer, 0, encodedBytes, 0,encodedBytes.length);
+                                data = new String(encodedBytes, "US-ASCII");
+                                readBufferPosition = 0;
+                            }
+                            else {
+                                readBuffer[readBufferPosition++] = b;
+                            }
+                        }
+                    }
+                    inputException = null;
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    running = false;
+                    inputException = e;
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    readBufferPosition = 0;
+                }
+            }
+            //Quando abbiamo finito
+            try {
+                inputStream.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
         public boolean isRunning() {
-            return running;
+            return running && !Thread.currentThread().isInterrupted();
         }
 
         public void setRunning(boolean running) {
             this.running = running;
         }
+
+        public String getData() {
+            return data;
+        }
+
+        public IOException getInputException() {
+            return inputException;
+        }
     }
 
-    public interface Communicator {
-        void communicate(Communication communication);
+    public interface CommunicationReceiver {
+        void onNewCommunicationReceived(Communication communication);
     }
     public enum Communication {
         CONNECTION_SUCCESS, CONNECTION_ERROR, INPUT_ERROR, OUTPUT_ERROR, CONNECTION_CLOSED

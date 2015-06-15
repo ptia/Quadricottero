@@ -19,7 +19,7 @@ import java.util.Set;
 import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
 
 
-public class MainActivity extends AppCompatActivity implements BluetoothSerial.Communicator {
+public class MainActivity extends AppCompatActivity implements BluetoothSerial.CommunicationReceiver {
     BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     BluetoothAdapter bluetoothAdapter;
     MenuItem connectMenu;
@@ -37,12 +37,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             @Override
             public void onClick(View v) {
                 bluetoothSerial.print(sendText.getText().toString());
+                //Toast.makeText(MainActivity.this,bluetoothSerial.readString() ,Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
-    public void communicate(BluetoothSerial.Communication communication) {
+    public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
         if (communication == CONNECTION_SUCCESS) {
             setTitle("Quadricottero @ "+bluetoothSerial.getDevice().getName());
             Toast.makeText(this,"Connesso",Toast.LENGTH_SHORT).show();
