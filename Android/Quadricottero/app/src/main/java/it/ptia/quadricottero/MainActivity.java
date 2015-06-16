@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
 
 
 public class MainActivity extends AppCompatActivity implements BluetoothSerial.CommunicationReceiver {
+    private static final String TAG = "MainActivity";
     BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     BluetoothAdapter bluetoothAdapter;
     MenuItem connectMenu;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
     ScrollView scroller;
     LogSaver logSaver;
     File logFile;
+    String receivedData ="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,11 +95,16 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         }
         else if (communication == INCOMING_DATA) {
             String newString = bluetoothSerial.readString()+"\n";
-            receivedTextView.append(newString);
-            scrollToBottom();
+            receivedData = receivedData.concat(newString);
             if(logSaver.isRunning()) {
                 logSaver.appendString(newString);
             }
+            //If the cumulative text to display is too long, remove its beginning
+            if(receivedData.length()>2000) {
+                receivedData = receivedData.substring(receivedData.length()-2000);
+            }
+            receivedTextView.setText(receivedData);
+            scrollToBottom();
         }
     }
 
@@ -138,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         scroller.post(new Runnable() {
             @Override
             public void run() {
-                scroller.smoothScrollTo(0, receivedTextView.getBottom());
+                scroller.scrollTo(0, receivedTextView.getBottom());
             }
         });
     }
@@ -180,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         if(id == R.id.action_save_log) {
             new Thread(logSaver).start();
             saveLogMenu.setVisible(false);
+            Toast.makeText(this, "Salvando il log in: "+logFile.getAbsolutePath(),Toast.LENGTH_LONG);
         }
 
         return super.onOptionsItemSelected(item);

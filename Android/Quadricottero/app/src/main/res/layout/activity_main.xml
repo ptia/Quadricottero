@@ -41,8 +41,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/received_text_view"
-            android:maxLines="250" />
+            android:id="@+id/received_text_view" />
     </ScrollView>
 
 </RelativeLayout>
