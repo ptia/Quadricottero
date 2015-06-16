@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
@@ -25,10 +28,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
     BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     BluetoothAdapter bluetoothAdapter;
     MenuItem connectMenu;
+    MenuItem saveLogMenu;
     Button sendButton;
     EditText sendText;
     TextView receivedTextView;
     ScrollView scroller;
+    LogSaver logSaver;
+    File logFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,15 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         sendText = (EditText) findViewById(R.id.send_message_edittext);
         receivedTextView = (TextView) findViewById(R.id.received_text_view);
         scroller = (ScrollView) findViewById(R.id.received_text_scroller);
+        logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
+                "LogQuadricottero.txt");
+        try {
+            logFile.createNewFile();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        logSaver = new LogSaver(logFile.getAbsolutePath());
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             sendButton.setEnabled(true);
             sendText.setEnabled(true);
             connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_action_disconnect));
+            connectMenu.setTitle("Disconnetti");
+            saveLogMenu.setVisible(true);
         }
         else if (communication == CONNECTION_ERROR) {
             Toast.makeText(this,
@@ -68,12 +85,18 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_bt_connect));
             sendButton.setEnabled(false);
             sendText.setEnabled(false);
+            logSaver.setRunning(false);
+            saveLogMenu.setVisible(false);
             Toast.makeText(this,"Disconnesso",Toast.LENGTH_SHORT).show();
             setTitle("Quadricottero");
         }
         else if (communication == INCOMING_DATA) {
-            receivedTextView.append(bluetoothSerial.readString()+"\n");
+            String newString = bluetoothSerial.readString()+"\n";
+            receivedTextView.append(newString);
             scrollToBottom();
+            if(logSaver.isRunning()) {
+                logSaver.appendString(newString);
+            }
         }
     }
 
@@ -112,10 +135,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
 
     private void scrollToBottom()
     {
-        scroller.post(new Runnable()
-        {
-            public void run()
-            {
+        scroller.post(new Runnable() {
+            @Override
+            public void run() {
                 scroller.smoothScrollTo(0, receivedTextView.getBottom());
             }
         });
@@ -134,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         connectMenu = menu.findItem(R.id.action_bt_connect);
+        saveLogMenu = menu.findItem(R.id.action_save_log);
         return true;
     }
 
@@ -153,6 +176,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
                 bluetoothSerial.close();
             }
             return true;
+        }
+        if(id == R.id.action_save_log) {
+            new Thread(logSaver).start();
+            saveLogMenu.setVisible(false);
         }
 
         return super.onOptionsItemSelected(item);
