@@ -19,8 +19,8 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
     private BluetoothDevice device;
     private CommunicationReceiver communicationReceiver;
 
-    public BluetoothSerial(CommunicationReceiver communicator) {
-        this.communicationReceiver = communicator;
+    public BluetoothSerial(CommunicationReceiver communicationReceiver) {
+        this.communicationReceiver = communicationReceiver;
     }
 
     public void begin(BluetoothDevice device) {
@@ -94,6 +94,10 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         return device;
     }
 
+    public void setCommunicationReceiver(CommunicationReceiver communicationReceiver) {
+        this.communicationReceiver = communicationReceiver;
+    }
+
     private class DataListener implements Runnable {
         private static final String TAG = "DataListener";
         final Handler handler = new Handler();
@@ -128,7 +132,6 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
                                 System.arraycopy(readBuffer, 0, encodedBytes, 0,encodedBytes.length);
                                 data = new String(encodedBytes, "US-ASCII");
                                 readBufferPosition = 0;
-                                Log.i(TAG, "new string: " + data);
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {

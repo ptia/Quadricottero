@@ -8,12 +8,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,87 +25,22 @@ import java.util.Set;
 import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
 
 
-public class MainActivity extends AppCompatActivity implements BluetoothSerial.CommunicationReceiver {
+public class MainActivity extends AppCompatActivity implements  BluetoothSerial.CommunicationReceiver{
     private static final String TAG = "MainActivity";
     BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     BluetoothAdapter bluetoothAdapter;
     MenuItem connectMenu;
     MenuItem saveLogMenu;
-    Button sendButton;
-    EditText sendText;
-    TextView receivedTextView;
-    ScrollView scroller;
-    LogSaver logSaver;
-    File logFile;
-    String receivedData ="";
+    TerminalFragment terminalFragment;
+    FrameLayout fragmentContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.layout_main);
+        terminalFragment = new TerminalFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, terminalFragment).commit();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        sendButton = (Button) findViewById(R.id.send_button);
-        sendText = (EditText) findViewById(R.id.send_message_edittext);
-        receivedTextView = (TextView) findViewById(R.id.received_text_view);
-        scroller = (ScrollView) findViewById(R.id.received_text_scroller);
-        logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
-                "LogQuadricottero.txt");
-        try {
-            logFile.createNewFile();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        logSaver = new LogSaver(logFile.getAbsolutePath());
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bluetoothSerial.print(sendText.getText().toString());
-            }
-        });
-    }
-
-    @Override
-    public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
-        if (communication == CONNECTION_SUCCESS) {
-            setTitle("Quadricottero @ "+bluetoothSerial.getDevice().getName());
-            Toast.makeText(this,"Connesso",Toast.LENGTH_SHORT).show();
-            sendButton.setEnabled(true);
-            sendText.setEnabled(true);
-            connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_action_disconnect));
-            connectMenu.setTitle("Disconnetti");
-            saveLogMenu.setVisible(true);
-        }
-        else if (communication == CONNECTION_ERROR) {
-            Toast.makeText(this,
-                    "Connessione con " +bluetoothSerial.getDevice().getName()+" fallita",
-                    Toast.LENGTH_SHORT).show();
-        }
-        else if (communication == OUTPUT_ERROR) {
-            bluetoothSerial.close();
-        }
-        else if (communication == CONNECTION_CLOSED) {
-            connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_bt_connect));
-            sendButton.setEnabled(false);
-            sendText.setEnabled(false);
-            logSaver.setRunning(false);
-            saveLogMenu.setVisible(false);
-            Toast.makeText(this,"Disconnesso",Toast.LENGTH_SHORT).show();
-            setTitle("Quadricottero");
-        }
-        else if (communication == INCOMING_DATA) {
-            String newString = bluetoothSerial.readString()+"\n";
-            receivedData = receivedData.concat(newString);
-            if(logSaver.isRunning()) {
-                logSaver.appendString(newString);
-            }
-            //If the cumulative text to display is too long, remove its beginning
-            if(receivedData.length()>2000) {
-                receivedData = receivedData.substring(receivedData.length()-2000);
-            }
-            receivedTextView.setText(receivedData);
-            scrollToBottom();
-        }
     }
 
     @Override
@@ -114,6 +49,14 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             Toast.makeText(this, "È necessario attivare il bluetooth", Toast.LENGTH_SHORT).show();
             finish();
         }
+    }
+
+    @Override
+    public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
+        if (communication == CONNECTION_SUCCESS) {
+            terminalFragment.setBluetoothSerial(bluetoothSerial);
+        }
+        terminalFragment.onNewCommunicationReceived(communication);
     }
 
     private void chooseDevice() {
@@ -141,16 +84,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         builder.create().show();
     }
 
-    private void scrollToBottom()
-    {
-        scroller.post(new Runnable() {
-            @Override
-            public void run() {
-                scroller.scrollTo(0, receivedTextView.getBottom());
-            }
-        });
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -161,11 +94,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_main, menu);
         connectMenu = menu.findItem(R.id.action_bt_connect);
         saveLogMenu = menu.findItem(R.id.action_save_log);
-        return true;
+        return false;
     }
 
     @Override
@@ -173,10 +106,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_bt_connect) {
+        if (item.getItemId() == R.id.action_bt_connect) {
             if(!bluetoothSerial.isConnected()){
                 chooseDevice();
             }
@@ -185,14 +115,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothSerial.C
             }
             return true;
         }
-        if(id == R.id.action_save_log) {
-            new Thread(logSaver).start();
-            saveLogMenu.setVisible(false);
-            Toast.makeText(this, "Salvando il log in: "+logFile.getAbsolutePath(),Toast.LENGTH_LONG);
-        }
-
-        return super.onOptionsItemSelected(item);
+        return false;
     }
-
-
 }
