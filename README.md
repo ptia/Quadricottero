@@ -11,9 +11,9 @@ Its main features are:
 
 I personally wrote most of the code, but I used external libraries to interface with the MPU-6050 and wrote my own library for interrupt-driven pulseIn (used to read radio signal) based on PCint Library. The PID library used is from this awesome quadcopter flight controller: https://github.com/baselsw/BlueCopter
 
-The Android client is, up to now, nothing more than a bluetooth terminal, but I am focusing on its development.
-This is its to-do list:
+The Android client is currently being developed. Its features are:
 * Log save in .txt files
+This is its to-do list:
 * Better incoming log data represention, e.g. graphics
 * Better settings manager graphical representation, e.g. charts for PID values
 * Mobile, bluetooth-driven control of the quadcopter
