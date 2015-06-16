@@ -1,5 +1,5 @@
 void log() {
-  if(showLog) {
+  if (showLog) {
     printThrottle();
     if (!lowThrottle) {
       printTab();
@@ -100,4 +100,37 @@ void printTab() {
 
 void printNewLine() {
   Serial.print(F("\n"));
+}
+
+void printBookmark() {
+  Serial.println(F("<bookmark>"));
+}
+
+int potLastVal = 1;
+boolean shouldPrintBookmark() {
+  /*Pot can be in 3 position: off, mid and on
+  * a bookmark is sent when the signal goes to off
+  * to mid, and then to on. This is to avoid sending
+  * lots of bookmarks for every loop when the pot is read as on.
+  * Position mid is needed because a pot is an analog
+  * device, and if it's in the middle its reading can change
+  * from on to off. By using a third, un-registered value (mid)
+  * we avoid this problem. Think of it as a debouncing system for
+  * an analog pot
+  */
+  int potVal = map(PCintPulseIn(RXpins[4]), signalMin[4], signalMax[4], 3, 0);
+  /*Recording this value as the 'old' one for the next time
+  * notice how the value 'mid' (1) is ignored
+  */
+  if (potVal == 0) {
+    potLastVal = 0;
+  }
+  if (potVal == 3) {
+    if (potLastVal == 0) {
+      potLastVal = 3;
+      return true;
+    }
+    potLastVal = 3;
+  }
+  return false;
 }

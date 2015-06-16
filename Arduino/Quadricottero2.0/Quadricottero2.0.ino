@@ -16,11 +16,11 @@
 
 /*Liste relative ai canali RX
 * in queste liste l'ordine è sempre:
-* THROTTLE, PITCH, ROLL, YAW
+* THROTTLE, PITCH, ROLL, YAW, POT_A
 */
-const int RXpins[] = {A0, A1, A2, A3};
-const int signalMin[] = {1172, 1176, 1160, 1132};
-const int signalMax[] = {1816, 1816, 1944, 1940};
+const int RXpins[] = {A0, A1, A2, A3, 8};
+const int signalMin[] = {1172, 1176, 1160, 1132, 2008};
+const int signalMax[] = {1816, 1816, 1944, 1940, 996};
 int16_t throttle;
 bool throttleLock, lowThrottle;
 #define THROTTLE_MAX 1000

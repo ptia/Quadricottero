@@ -25,8 +25,11 @@ void loop() {
   }
   readRX();
   if (throttleLock) {
-    readSerialPreferences();
     sendToMotors(MOTOR_MIN_SPEED);
+    readSerialPreferences();
+    if(shouldPrintBookmark()) {
+      printBookmark();
+    }
     return;
   }
   computePID();
