@@ -20,12 +20,21 @@ void readSerialPreferences() {
   }
 }
 
-uint8_t pidElement;
 void PIDprefManager(char newByte) {
+  int pidElement;
+  if (newByte == 'S') {
+    savePIDk();
+    printPIDk();
+    Serial.println("Saved");
+    return;
+  }
+  
   if (newByte == '#') {
     pidElement = Serial.parseInt();
+    printPIDk();
   }
-  else if (newByte == '=') {
+  
+  if (Serial.read() == '=') {
     if (pidElement < 9) {
       acroPIDk[pidElement] = (float) Serial.parseInt() / 10.0;
     }
@@ -34,11 +43,4 @@ void PIDprefManager(char newByte) {
     }
     setPIDk();
   }
-  else if (newByte == 'S') {
-    savePIDk();
-  }
-  else {
-    return;
-  }
-  printPIDk();
 }
