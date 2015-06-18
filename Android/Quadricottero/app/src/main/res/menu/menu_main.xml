@@ -1,15 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/action_bt_connect"
+        android:title="Connetti"
+        android:icon="@drawable/ic_bt_connect"
+        android:visible="false"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="0"/>
     <item android:id="@+id/action_save_log"
         android:title="Salva log"
         android:icon="@drawable/ic_save_log"
         app:showAsAction="ifRoom"
         android:visible="false"
         android:orderInCategory="1"/>
-    <item android:id="@+id/action_bt_connect"
-        android:title="Connetti"
-        android:icon="@drawable/ic_bt_connect"
+    <item android:id="@+id/action_send_pid"
+        android:title="Invia"
+        android:icon="@drawable/ic_action_send_pid"
         app:showAsAction="ifRoom"
-        android:orderInCategory="2"/>
+        android:visible="false"
+        android:orderInCategory="1"/>
+    <item android:id="@+id/action_bt_disconnect"
+        android:title="Disconnetti"
+        android:icon="@drawable/ic_action_disconnect"
+        android:visible="false"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="9"/>
 </menu>

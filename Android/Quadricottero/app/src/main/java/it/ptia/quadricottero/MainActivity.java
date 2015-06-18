@@ -6,41 +6,80 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 
-import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
-
+import static it.ptia.quadricottero.BluetoothSerial.Communication.CONNECTION_CLOSED;
+import static it.ptia.quadricottero.BluetoothSerial.Communication.CONNECTION_ERROR;
+import static it.ptia.quadricottero.BluetoothSerial.Communication.CONNECTION_SUCCESS;
 
 public class MainActivity extends AppCompatActivity implements  BluetoothSerial.CommunicationReceiver{
     private static final String TAG = "MainActivity";
+
     BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     BluetoothAdapter bluetoothAdapter;
+
     MenuItem connectMenu;
-    MenuItem saveLogMenu;
+    MenuItem disconnectMenu;
+
+    String currentFragment;
     TerminalFragment terminalFragment;
-    FrameLayout fragmentContainer;
+    PIDSettingsFragment pidSettingsFragment;
+
+    TabLayout tabLayout;
+    TabLayout.Tab terminalTab;
+    TabLayout.Tab pidTab;
+
+    Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
-        terminalFragment = new TerminalFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, terminalFragment).commit();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        terminalFragment = new TerminalFragment();
+        pidSettingsFragment = new PIDSettingsFragment();
+        terminalFragment.setBluetoothSerial(bluetoothSerial);
+        pidSettingsFragment.setBluetoothSerial(bluetoothSerial);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, terminalFragment).commit();
+        currentFragment = TerminalFragment.TAG;
+
+        tabLayout = (TabLayout) findViewById(R.id.tab_view);
+        terminalTab = tabLayout.newTab().setText("Terminale");
+        pidTab = tabLayout.newTab().setText("Configura PID");
+        tabLayout.addTab(pidTab);
+        tabLayout.addTab(terminalTab, true);
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.equals(pidTab)) {
+                    terminalFragment.closeLogSaver();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, pidSettingsFragment).commit();
+                    currentFragment = PIDSettingsFragment.TAG;
+                }
+                else if (tab.equals(terminalTab)) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, terminalFragment).commit();
+                    currentFragment = TerminalFragment.TAG;
+                }
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
     }
 
     @Override
@@ -54,9 +93,25 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
     @Override
     public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
         if (communication == CONNECTION_SUCCESS) {
-            terminalFragment.setBluetoothSerial(bluetoothSerial);
+            getSupportActionBar().setTitle("Quadricottero @ " + bluetoothSerial.getDevice().getName());
+            Toast.makeText(this, "Connesso", Toast.LENGTH_SHORT).show();
+            invalidateOptionsMenu();
         }
-        terminalFragment.onNewCommunicationReceived(communication);
+        if(communication == CONNECTION_CLOSED) {
+            getSupportActionBar().setTitle("Quadricottero");
+            invalidateOptionsMenu();
+        }
+        if(communication == CONNECTION_ERROR) {
+            Toast.makeText(this,
+                    "Connessione con " +bluetoothSerial.getDevice().getName()+" fallita",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(currentFragment.equals(TerminalFragment.TAG)) {
+            terminalFragment.onNewCommunicationReceived(communication);
+        }
+        if(currentFragment.equals(PIDSettingsFragment.TAG)) {
+            pidSettingsFragment.onNewCommunicationReceived(communication);
+        }
     }
 
     private void chooseDevice() {
@@ -97,7 +152,15 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_main, menu);
         connectMenu = menu.findItem(R.id.action_bt_connect);
-        saveLogMenu = menu.findItem(R.id.action_save_log);
+        disconnectMenu = menu.findItem(R.id.action_bt_disconnect);
+        if (bluetoothSerial.isConnected()) {
+            connectMenu.setVisible(false);
+            disconnectMenu.setVisible(true);
+        }
+        else {
+            connectMenu.setVisible(true);
+            disconnectMenu.setVisible(false);
+        }
         return false;
     }
 
@@ -107,12 +170,13 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         if (item.getItemId() == R.id.action_bt_connect) {
-            if(!bluetoothSerial.isConnected()){
-                chooseDevice();
-            }
-            else {
-                bluetoothSerial.close();
-            }
+            chooseDevice();
+            invalidateOptionsMenu();
+            return true;
+        }
+        if(item.getItemId() == R.id.action_bt_disconnect) {
+            bluetoothSerial.close();
+            invalidateOptionsMenu();
             return true;
         }
         return false;

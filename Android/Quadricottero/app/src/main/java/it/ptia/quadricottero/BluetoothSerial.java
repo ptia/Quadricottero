@@ -37,7 +37,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
             Thread dataReceiverThread = new Thread(dataListener);
             dataReceiverThread.start();
             this.socket = bluetoothSocket;
-            Log.i(TAG,"Succesfully connected");
+            Log.i(TAG, "Succesfully connected");
             communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_SUCCESS);
         }
         catch (IOException | NullPointerException e) {
@@ -53,31 +53,37 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
             socket.close();
             dataListener.setRunning(false);
             communicationReceiver.onNewCommunicationReceived(Communication.CONNECTION_CLOSED);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
     }
 
-    public void print(String msg) {
-        try {
-            if(isConnected()) {
-                outputStream.write(msg.getBytes());
-            }
+    public void write(byte b) throws IOException {
+        if(isConnected()) {
+            outputStream.write(b);
         }
-        catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-            communicationReceiver.onNewCommunicationReceived(Communication.OUTPUT_ERROR);
+        else throw new IOException("Not connected to device");
+    }
+
+    public void print(String msg) throws IOException {
+        if(isConnected()) {
+            outputStream.write(msg.getBytes());
         }
+        else throw new IOException("Not connected to device");
 
     }
 
-    public String readString() {
+    public void println(String msg) throws IOException {
+        print(msg);
+        write(ASCII_NEWLINE);
+    }
+
+    public String readString() throws IOException {
         if(dataListener.getInputException() == null) {
             return dataListener.getData();
         }
         else {
-            communicationReceiver.onNewCommunicationReceived(Communication.INPUT_ERROR);
-            return null;
+            throw dataListener.getInputException();
         }
     }
 
@@ -196,6 +202,6 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
         void onNewCommunicationReceived(Communication communication);
     }
     public enum Communication {
-        CONNECTION_SUCCESS, CONNECTION_ERROR, INPUT_ERROR, OUTPUT_ERROR, CONNECTION_CLOSED, INCOMING_DATA
+        CONNECTION_SUCCESS, CONNECTION_ERROR, CONNECTION_CLOSED, INCOMING_DATA
     }
 }

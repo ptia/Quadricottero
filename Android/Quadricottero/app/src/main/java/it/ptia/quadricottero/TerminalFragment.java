@@ -22,9 +22,8 @@ import java.io.IOException;
 import static it.ptia.quadricottero.BluetoothSerial.Communication.*;
 
 public class TerminalFragment extends Fragment implements BluetoothSerial.CommunicationReceiver{
-    MenuItem connectMenu;
-    MenuItem saveLogMenu;
-    private BluetoothSerial bluetoothSerial = null;
+    public static final String TAG = "TerminalFragment";
+    private BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
     Button sendButton;
     EditText sendText;
     TextView receivedTextView;
@@ -43,6 +42,10 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
         sendText = (EditText) rootLayout.findViewById(R.id.send_message_edittext);
         receivedTextView = (TextView) rootLayout.findViewById(R.id.received_text_view);
         scroller = (ScrollView) rootLayout.findViewById(R.id.received_text_scroller);
+        if(bluetoothSerial.isConnected()) {
+            sendButton.setEnabled(true);
+            sendText.setEnabled(true);
+        }
         logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
                 "LogQuadricottero.txt");
         try {
@@ -55,7 +58,11 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBluetoothSerial().print(sendText.getText().toString());
+                try {
+                    getBluetoothSerial().print(sendText.getText().toString());
+                } catch (IOException e) {
+                    bluetoothSerial.close();
+                }
             }
         });
         return rootLayout;
@@ -64,33 +71,24 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
     @Override
     public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
         if (communication == CONNECTION_SUCCESS) {
-            getActivity().setTitle("Quadricottero @ " + bluetoothSerial.getDevice().getName());
-            Toast.makeText(getActivity(),"Connesso",Toast.LENGTH_SHORT).show();
             sendButton.setEnabled(true);
             sendText.setEnabled(true);
-            connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_action_disconnect));
-            connectMenu.setTitle("Disconnetti");
-            saveLogMenu.setVisible(true);
         }
-        else if (communication == CONNECTION_ERROR) {
-            Toast.makeText(getActivity(),
-                    "Connessione con " +bluetoothSerial.getDevice().getName()+" fallita",
-                    Toast.LENGTH_SHORT).show();
-        }
-        else if (communication == OUTPUT_ERROR) {
-            bluetoothSerial.close();
-        }
+
         else if (communication == CONNECTION_CLOSED) {
-            connectMenu.setIcon(getResources().getDrawable(R.drawable.ic_bt_connect));
             sendButton.setEnabled(false);
             sendText.setEnabled(false);
             logSaver.setRunning(false);
-            saveLogMenu.setVisible(false);
-            Toast.makeText(getActivity(),"Disconnesso",Toast.LENGTH_SHORT).show();
-            getActivity().setTitle("Quadricottero");
         }
         else if (communication == INCOMING_DATA) {
-            String newString = bluetoothSerial.readString()+"\n";
+            String newString = null;
+            try {
+                newString = bluetoothSerial.readString()+"\n";
+            } catch (IOException e) {
+                e.printStackTrace();
+                bluetoothSerial.close();
+                return;
+            }
             receivedData = receivedData.concat(newString);
             if(logSaver.isRunning()) {
                 logSaver.appendString(newString);
@@ -108,8 +106,8 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save_log) {
             new Thread(logSaver).start();
-            saveLogMenu.setVisible(false);
             Toast.makeText(getActivity(), "Salvando il log in: " + logFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            getActivity().invalidateOptionsMenu();
             return true;
         }
         return false;
@@ -125,12 +123,21 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
         });
     }
 
+    public void closeLogSaver() {
+        logSaver.setRunning(false);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        //inflater.inflate(R.menu.menu_main, menu);
-        connectMenu = menu.findItem(R.id.action_bt_connect);
-        saveLogMenu = menu.findItem(R.id.action_save_log);
+
+        MenuItem saveLogMenu = menu.findItem(R.id.action_save_log);
+        if(!logSaver.isRunning() && bluetoothSerial.isConnected()) {
+            saveLogMenu.setVisible(true);
+        }
+        else {
+            saveLogMenu.setVisible(false);
+        }
     }
 
     public BluetoothSerial getBluetoothSerial() {
