@@ -14,9 +14,9 @@ I personally wrote most of the code, but I used external libraries to interface 
 The Android client is currently being developed. Its features are:
 * Basic serial terminal (send and receive data)
 * Quadcopter log save in .txt files
+* Graphical PID settings manager to edit PID constants
 
 This is its to-do list (sorted by predicted priority and ease):
-* Better settings manager graphical representation, e.g. charts for PID values
 * Better incoming log data represention, e.g. graphics
 * Mobile, bluetooth-driven direct control of the quadcopter
 
