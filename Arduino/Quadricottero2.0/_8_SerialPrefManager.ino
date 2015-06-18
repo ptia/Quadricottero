@@ -28,12 +28,15 @@ void PIDprefManager(char newByte) {
     Serial.println("Saved");
     return;
   }
-  
-  if (newByte == '#') {
-    pidElement = Serial.parseInt();
+
+  if (newByte == 'P') {
     printPIDk();
   }
-  
+
+  if (newByte == '#') {
+    pidElement = Serial.parseInt();
+  }
+
   if (Serial.read() == '=') {
     if (pidElement < 9) {
       acroPIDk[pidElement] = (float) Serial.parseInt() / 10.0;

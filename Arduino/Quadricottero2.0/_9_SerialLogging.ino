@@ -95,7 +95,7 @@ void printPIDk() {
 }
 
 void printTab() {
-  Serial.print(F("\t"));
+  Serial.print(F("    "));
 }
 
 void printNewLine() {
