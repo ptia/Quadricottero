@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
     private BluetoothSerial bluetoothSerial = new BluetoothSerial(this);
 
     EditText[] pidEditText = new EditText[15];
+    Spinner flightModeSpinner;
     SwipeRefreshLayout refresher;
 
     boolean saveMenuVisible = true;
@@ -37,7 +40,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
             @Override
             public void onRefresh() {
                 if(bluetoothSerial.isConnected())
-                refreshPIDvalues();
+                refreshData();
             }
         });
         pidEditText[0] = (EditText) rootLayout.findViewById(R.id.acro_pitch_p);
@@ -55,6 +58,11 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
         pidEditText[12] = (EditText) rootLayout.findViewById(R.id.stable_roll_p);
         pidEditText[13] = (EditText) rootLayout.findViewById(R.id.stable_roll_i);
         pidEditText[14] = (EditText) rootLayout.findViewById(R.id.stable_roll_d);
+        flightModeSpinner = (Spinner) rootLayout.findViewById(R.id.flight_mode_spinner);
+        ArrayAdapter<CharSequence> flightModeAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.flight_modes,
+                android.R.layout.simple_spinner_item);
+        flightModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        flightModeSpinner.setAdapter(flightModeAdapter);
         if(bluetoothSerial.isConnected()) {
             refresher.setEnabled(true);
             refresher.post(new Runnable() {
@@ -62,7 +70,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
                     refresher.setRefreshing(true);
                 }
             });
-            refreshPIDvalues();
+            refreshData();
         }
         else {
             refresher.setEnabled(false);
@@ -74,7 +82,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
     @Override
     public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
         if(communication == CONNECTION_SUCCESS) {
-            refreshPIDvalues();
+            refreshData();
             refresher.setEnabled(true);
             refresher.setRefreshing(true);
         }
@@ -82,7 +90,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
             refresher.setEnabled(false);
             setEnabled(false);
         }
-        //Acro: 1    2    3    1    2    3    1    2    3    stabilize: 1    2    3    1    2    3
+        //Acro: 1    2    3    1    2    3    1    2    3    stabilize: 1    2    3    1    2    3    M1
         if(communication == INCOMING_DATA) {
             String newString = null;
             try {
@@ -97,6 +105,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
                 for (int i = 0; i < pidEditText.length; i++) {
                     pidEditText[i].setText(valuesArray[i]);
                 }
+                flightModeSpinner.setSelection(Integer.parseInt(newString.split("m")[1]));
                 refresher.setRefreshing(false);
                 setEnabled(true);
             }
@@ -108,13 +117,14 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
         }
     }
 
-    private void sendValues() {
+    private void sendData() {
         try {
             String message = "";
             for(int i = 0; i < pidEditText.length; i++) {
                 Integer val = (int) (Float.parseFloat(pidEditText[i].getText().toString()) * 10);
                 message = message.concat("#"+i+"="+val+"||");
             }
+            message = message.concat("M"+flightModeSpinner.getSelectedItemPosition()+"||");
             Log.i(TAG, "sending "+message);
             bluetoothSerial.print(message);
         } catch (IOException e) {
@@ -123,7 +133,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
         }
     }
 
-    private void refreshPIDvalues() {
+    private void refreshData() {
         try {
             bluetoothSerial.print("P");
         } catch (IOException e) {
@@ -137,6 +147,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
         for (EditText editText : pidEditText) {
             editText.setEnabled(enabled);
         }
+        flightModeSpinner.setEnabled(enabled);
         saveMenuVisible = enabled;
         getActivity().invalidateOptionsMenu();
     }
@@ -144,7 +155,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.action_send_pid) {
-            sendValues();
+            sendData();
             return true;
         }
         return false;
