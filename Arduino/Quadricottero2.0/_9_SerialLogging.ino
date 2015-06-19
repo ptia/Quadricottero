@@ -80,7 +80,7 @@ void printMotorSpeeds() {
   }
 }
 
-void printPIDk() {
+void printlnPIDk() {
   Serial.print("Acro: ");
   for (int i = 0; i < 9; i++) {
     Serial.print(acroPIDk[i]);
@@ -92,6 +92,19 @@ void printPIDk() {
     printTab();
   }
   printNewLine();
+}
+
+void printPIDk() {
+  Serial.print("Acro: ");
+  for (int i = 0; i < 9; i++) {
+    Serial.print(acroPIDk[i]);
+    printTab();
+  }
+  Serial.print("Stabilize: ");
+  for (int i = 0; i < 6; i++) {
+    Serial.print(stabilizePIDk[i]);
+    printTab();
+  }
 }
 
 void printTab() {

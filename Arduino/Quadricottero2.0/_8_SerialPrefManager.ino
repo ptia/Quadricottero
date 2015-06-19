@@ -16,6 +16,14 @@ void readSerialPreferences() {
       angleOffset[1] = angle[1];
       continue;
     }
+
+    if (newByte == 'P') {
+      printPIDk();
+      Serial.print("M");
+      Serial.println(flightMode);
+      continue;
+    }
+    
     PIDprefManager(newByte);
   }
 }
@@ -24,13 +32,9 @@ void PIDprefManager(char newByte) {
   int pidElement;
   if (newByte == 'S') {
     savePIDk();
-    printPIDk();
+    printlnPIDk();
     Serial.println("Saved");
     return;
-  }
-
-  if (newByte == 'P') {
-    printPIDk();
   }
 
   if (newByte == '#') {
