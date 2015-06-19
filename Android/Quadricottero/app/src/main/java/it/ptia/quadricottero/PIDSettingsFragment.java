@@ -33,7 +33,6 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView");
         View rootLayout= inflater.inflate(R.layout.fragment_pid_settings, null);
         refresher = (SwipeRefreshLayout) rootLayout.findViewById(R.id.pull_to_refresh_container);
         refresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -110,7 +109,7 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
                 setEnabled(true);
             }
             else if(!newString.startsWith("fifo")){
-                Toast.makeText(getActivity(), "Inserisci il blocco del throttle", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.insert_throttle_lock_toast, Toast.LENGTH_SHORT).show();
                 setEnabled(false);
                 refresher.setRefreshing(false);
             }

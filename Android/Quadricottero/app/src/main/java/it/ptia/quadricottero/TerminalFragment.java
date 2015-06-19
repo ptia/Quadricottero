@@ -106,7 +106,7 @@ public class TerminalFragment extends Fragment implements BluetoothSerial.Commun
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save_log) {
             new Thread(logSaver).start();
-            Toast.makeText(getActivity(), "Salvando il log in: " + logFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), getString(R.string.saving_log_toast) + logFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
             getActivity().invalidateOptionsMenu();
             return true;
         }

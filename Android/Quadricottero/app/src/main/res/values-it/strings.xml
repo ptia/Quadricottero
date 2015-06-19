@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="flight_modes">
+    <item>Acrobatica</item>
+    <item>Stabilizzata</item>
+    </string-array>
+    <string name="device_select_dialog_title">Seleziona dispositivo</string>
+    <string name="connected">Connesso</string>
+    <string name="connection_failed">Impossibile connettersi a :\u0020</string>
+    <string name="must_enable_bt_toast">È necessario attivare il bluetooth</string>
+    <string name="terminal_tab_title">Terminale</string>
+    <string name="pid_tab_title">Configurazioni PID</string>
+    <string name="insert_throttle_lock_toast">Inserisci il blocco del throttle per accedere alle impostazioni</string>
+    <string name="pitch_stablized">Pitch (stabilizzato)</string>
+    <string name="roll_stabilized">Roll (stabilizzato)</string>
+    <string name="saving_log_toast">Salvando il log in :\u0020</string>
+    <string name="action_send">Invia</string>
+    <string name="action_connect">Connetti</string>
+    <string name="action_save_log">Salva il log</string>
+    <string name="disconnect">Disconnetti</string>
+    <string name="flight_mode_spinner">Modalità di volo</string>
+</resources>

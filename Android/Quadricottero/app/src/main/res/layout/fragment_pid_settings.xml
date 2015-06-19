@@ -154,7 +154,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pitch (stabilizzato)"
+                            android:text="@string/pitch_stablized"
                             android:layout_column="0" />
 
                         <EditText
@@ -185,7 +185,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Roll (stabilizzato)"
+                            android:text="@string/roll_stabilized"
                             android:layout_column="0" />
 
                         <EditText
@@ -217,7 +217,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Modalità di volo"/>
+                        android:text="@string/flight_mode_spinner"/>
                     <Spinner
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
         currentFragment = TerminalFragment.TAG;
 
         tabLayout = (TabLayout) findViewById(R.id.tab_view);
-        terminalTab = tabLayout.newTab().setText("Terminale");
-        pidTab = tabLayout.newTab().setText("Configura PID");
+        terminalTab = tabLayout.newTab().setText(R.string.terminal_tab_title);
+        pidTab = tabLayout.newTab().setText(R.string.pid_tab_title);
         tabLayout.addTab(pidTab);
         tabLayout.addTab(terminalTab, true);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(!bluetoothAdapter.isEnabled()) {
-            Toast.makeText(this, "È necessario attivare il bluetooth", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.must_enable_bt_toast, Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
     public void onNewCommunicationReceived(BluetoothSerial.Communication communication) {
         if (communication == CONNECTION_SUCCESS) {
             getSupportActionBar().setTitle("Quadricottero @ " + bluetoothSerial.getDevice().getName());
-            Toast.makeText(this, "Connesso", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.connected, Toast.LENGTH_SHORT).show();
             invalidateOptionsMenu();
         }
         if(communication == CONNECTION_CLOSED) {
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
         }
         if(communication == CONNECTION_ERROR) {
             Toast.makeText(this,
-                    "Connessione con " +bluetoothSerial.getDevice().getName()+" fallita",
+                    getString(R.string.connection_failed) +bluetoothSerial.getDevice().getName(),
                     Toast.LENGTH_SHORT).show();
         }
         if(currentFragment.equals(TerminalFragment.TAG)) {
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements  BluetoothSerial.
             i++;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Seleziona dispositivo");
+        builder.setTitle(R.string.device_select_dialog_title);
         builder.setItems(deviceNames, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
