@@ -1,4 +1,4 @@
-## Quadricottero - An Arduino quadcopter
+## Quadricottero - An Arduino quadcopter with an Android client
 
 Quadricottero is an Arduino-based quadcopter flight controller. 
 Its main features are:
