@@ -61,7 +61,7 @@ void printGyroscopeData() {
 }
 
 void printRawPRY() {
-  Serial.print(F("Delta motori:"));
+  Serial.print(F("Motor delta:"));
   Serial.print(F(" P:"));
   Serial.print(rawPRY[0]);
   Serial.print(F(" R:"));

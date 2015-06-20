@@ -4,21 +4,21 @@ void setup() {
   setupRX();
   readPIDk();
   armMotors();
-  //Non partire con throttle alto
+  //Do not start with hight throttle
   while (!(lowThrottle | throttleLock)) {
     Serial.println(F("Can't start with high throttle"));
     readRX();
   }
-  /*Il pin 13 è usato per segnalare
-  * la modalità di volo corrente
+  /*Pin 13 is used to notify
+  * the current flight mode
   */
   pinMode(13, OUTPUT);
   digitalWrite(13, flightMode);
 }
 
 void loop() {
-  /*Leggi IMU e interrompi
-  * se ci sono errori
+  /*Read IMU and stop if
+  * there are errors
   */
   if (updateIMU() == 1) {
     return;

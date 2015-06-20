@@ -62,13 +62,14 @@ void setupDMP() {
   }
 }
 
-/*Versione modificata dell'originale, che
-* eseguiva il loop normale solo aspettando che arrivassero
-* i dati. Ora viene eseguito solo quando i dati sono disponibili
-* ed ho aggiunto un sistema migliore di controllo delle eccezioni,
-* mediante il ritorno di 0 se va tutto bene o 1 se ci sono errori.
-* Questo ha permesso di inserire la funzione semplicemente all'inizio
-* del normale loop, con un controllo per gli errori
+/*Modified version of the original, that runned
+* the normal loop just while waiting for new data to arrive
+* Now it is runned after new data received, and a better
+* exception control system has been added to propagate 
+* exceptions returning 1 (if everything went right, 0 is
+* returned. This let me add this function just at the
+* beginnig of the flight control, with the needed exception
+* control system.
 */
 int updateIMU() {
   // if programming failed, don't try to do anything
@@ -105,7 +106,7 @@ int updateIMU() {
   // (this lets us immediately read more without waiting for an interrupt)
   fifoCount -= packetSize;
 
-  //Ricevi e immagazzina dati da giroscopio
+  //Receive and store data from gyro
   VectorInt16 gyroVector;
   mpu.dmpGetGyro(&gyroVector, fifoBuffer);
   gyro[0] = gyroVector.x;
@@ -113,14 +114,14 @@ int updateIMU() {
   gyro[2] = gyroVector.z;
 
   if (flightMode == STABILIZED_MODE) {
-    //Ricevi e immagazzina dati degli angoli PITCH e ROLL
+    //Receive and store data about PITCH e ROLL inclination
     VectorFloat gravity;
     float ypr[3];
     Quaternion q;
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-    //per qualche strano motivo sono invertiti pitch e roll
+    //Oddly, pitch and roll are inverted here
     angle[0] = angleOffset[0] - (ypr[2] * 180 / M_PI);
     angle[1] = angleOffset[1] + (ypr[1] * 180 / M_PI) - 2.09;
   }

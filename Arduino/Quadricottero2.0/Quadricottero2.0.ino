@@ -14,8 +14,8 @@
 
 //#######RX######
 
-/*Liste relative ai canali RX
-* in queste liste l'ordine è sempre:
+/*Arrays related to RX channels,
+* always sorted this way:
 * THROTTLE, PITCH, ROLL, YAW, POT_A
 */
 const int RXpins[] = {A0, A1, A2, A3, 8};
@@ -27,29 +27,27 @@ bool throttleLock, lowThrottle;
 
 //###SETPOINTS###
 
-/*Array in pry delle velocità angolari
-* da raggiungere
+/*Array of Pitch-Roll-Yaw
+* angular velocities to reach
 */
 float acroSet[3];
-/* Array in PR (no yaw) degli angoli
-* relativi al suolo da raggiungere
+/*Array of Pitch-Roll inclinations
+* (relative to ground) to reach
 */
 float stabilizeSet[2];
-/*I massimi e i minimi per le velocità
-* angolari da raggiungere
+/*Max and min for angular velocity
 */
 #define PR_ACRO_MAX 45
 #define YAW_MAX 5
-/*I massimi e i minimi per gli angoli
-* da raggiungere
+/*Max and min for inclination
 */
 #define PR_ANGLE_MAX 45
 
 
 //######IMU######
 
-/*Array dall'IMU
-* si rispetta l'ordine PRY
+/*Array of IMU data
+* sorted Pitch-Roll(-Yaw)
 */
 float gyro[3];
 float angle[2];
@@ -57,37 +55,33 @@ float angleOffset[2];
 
 //######PID######
 
-/*Lista di PID per modalità
-* acrobatica. Ordine sempre:
-* PITCH, ROLL, YAW
+/*Array of PIDs
+* PITCH, ROLL(, YAW)
 */
 PIDCont acroPID[3];
 PIDCont stabilizePID[2];
-/*Ordine delle costanti seguenti
+/*Following costants are
+* sorted this way:
 * Pitch: P, I, D
 * Roll: P, I, D
 * Yaw: P, I, D
 */
-//Configurazioni per PID acrobatico.
 float acroPIDk[9];
-//Configurazioni per PID acrobatico.
 float stabilizePIDk[6];
 
 
-//#####MOTORI#####
+//#####MOTORS#####
 
-/*Lista di classi Servo per i motori.
-* L'ordine dei motori è in senso
-* antiorario da avanti a sx,
+/*Array of Servo objects for the
+* motors. Always sorted counter-
+* clockwise from top left
 */
 Servo motors[4];
 /*Lista di pin dei motori, l'ordine
 * è sempre antiorario da avanti a sx
 */
 const int motorPins[] = {3, 4, 5, 6};
-/*Tutti i delta sono in realtà doppi
-* perchè sono applicati due volte
-*/
+
 /*Differenziale di velocità
 * dei motori, cioà il valore
 * massimo (e quindi minimo) di
@@ -95,18 +89,18 @@ const int motorPins[] = {3, 4, 5, 6};
 * dei motori
 */
 #define MAX_MOTOR_DELTA 100
-//Lista di valori delta PRY
+//Delta values for PRY
 int rawPRY[3];
-//Capisaldi di segnali per i motori
+
 #define MOTOR_MIN_SPEED 1100
 #define MOTOR_ARM 1000
-//Velocità dei singoli motori
+//Speeds of single motors
 int speeds[4];
 
-//#######ALTRO######
+//#####OTHERS#####
 
-/*Tipo di stabilizzazione da
-* attuare
+/*Kind of stabilization
+* to perform
 */
 #define ACRO_MODE 0
 #define STABILIZED_MODE 1

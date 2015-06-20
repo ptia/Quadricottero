@@ -9,11 +9,8 @@ void armMotors() {
 
 void sendMotorSpeeds() {
   int s0, s1, s2, s3;
-  /*Applica i delta di PRY al throttle
-  * sui singoli motori per calcolare le
-  * velocità, pronte per essere inviate
-  */
-  //Applica   throttle   pitch       roll        yaw
+  //Apply PRY delta to motor speeds
+  //Apply     throttle   pitch       roll        yaw
   speeds[0] = throttle - rawPRY[0] + rawPRY[1] + rawPRY[2];
   speeds[1] = throttle + rawPRY[0] + rawPRY[1] - rawPRY[2];
   speeds[2] = throttle + rawPRY[0] - rawPRY[1] + rawPRY[2];
