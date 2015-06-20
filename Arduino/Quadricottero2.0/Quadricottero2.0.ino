@@ -77,16 +77,12 @@ float stabilizePIDk[6];
 * clockwise from top left
 */
 Servo motors[4];
-/*Lista di pin dei motori, l'ordine
-* è sempre antiorario da avanti a sx
-*/
+
 const int motorPins[] = {3, 4, 5, 6};
 
-/*Differenziale di velocità
-* dei motori, cioà il valore
-* massimo (e quindi minimo) di
-* PRY come delta di velocità
-* dei motori
+/*Max delta of motor speed.
+* Notice that every delta is
+* double, as it is applied twice
 */
 #define MAX_MOTOR_DELTA 100
 //Delta values for PRY
