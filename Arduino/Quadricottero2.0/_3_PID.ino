@@ -24,12 +24,12 @@ void computePID() {
     return;
   }
   if (flightMode == STABILIZED_MODE) {
-    //Computa angular velocities from stabilized PID
+    //Compute angular velocities from stabilized PID
     for (int i = 0; i < 2; i++) {
       acroSet[i] = stabilizePID[i].Compute((float) stabilizeSet[i] - angle[i]);
     }
   }
-  //Computa motor delta values from acro PID
+  //Compute motor delta values from acro PID
   for (int i = 0; i < 3; i++) {
     rawPRY[i] = (int) acroPID[i].Compute((float) acroSet[i] - gyro[i]);
   }

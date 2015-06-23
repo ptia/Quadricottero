@@ -27,7 +27,7 @@ void loop() {
   if (throttleLock) {
     sendToMotors(MOTOR_MIN_SPEED);
     readSerialPreferences();
-    if(shouldPrintBookmark()) {
+    if (shouldPrintBookmark()) {
       printBookmark();
     }
     return;

@@ -15,78 +15,87 @@ void log() {
       printTab();
       printRawPRY();
     }
+    printVcc();
     printNewLine();
   }
 }
 
 void printThrottle() {
-  Serial.print(F("Throttle:"));
+  Serial.write('T');
   Serial.print(throttle);
+  Serial.write(' ');
 }
 
 void printAcroSet() {
-  Serial.print(F("Acro:"));
-  Serial.print(F(" P:"));
+  //A 0-1.4-7.7
+  Serial.write('A');
+  Serial.write(' ');
   Serial.print(acroSet[0]);
-  Serial.print(F(" R:"));
+  Serial.write('-');
   Serial.print(acroSet[1]);
-  Serial.print(F(" Y:"));
+  Serial.write('-');
   Serial.print(acroSet[2]);
+  Serial.write(' ');
 }
 
 void printPRangles() {
-  Serial.print(F("Angles:"));
-  Serial.print(F(" P:"));
+  //I 1.5-3.7
+  Serial.write('I');
+  Serial.write(' ');
   Serial.print(angle[0]);
-  Serial.print(F(" R:"));
+  Serial.write('-');
   Serial.print(angle[1]);
+  Serial.write(' ');
 }
 
 void printStabilizeSet() {
-  Serial.print(F("Stabilize:"));
-  Serial.print(F(" P:"));
+  //S 3.0-2.1
+  Serial.write('S');
+  Serial.write(' ');
   Serial.print(stabilizeSet[0]);
-  Serial.print(F(" R:"));
+  Serial.write('-');
   Serial.print(stabilizeSet[1]);
 }
 
 void printGyroscopeData() {
-  Serial.print(F("Gyro:"));
-  Serial.print(F(" P:"));
+  Serial.write('G');
+  Serial.write(' ');
   Serial.print(gyro[0]);
-  Serial.print(F(" R:"));
+  Serial.write(' ');
   Serial.print(gyro[1]);
-  Serial.print(F(" Y:"));
+  Serial.write(' ');
   Serial.print(gyro[2]);
+  Serial.write(' ');
 }
 
 void printRawPRY() {
-  Serial.print(F("Motor delta:"));
-  Serial.print(F(" P:"));
+  Serial.write('D');
+  Serial.write(' ');
   Serial.print(rawPRY[0]);
-  Serial.print(F(" R:"));
+  Serial.write('-');
   Serial.print(rawPRY[1]);
-  Serial.print(F(" Y:"));
+  Serial.write('-');
   Serial.print(rawPRY[2]);
+  Serial.write(' ');
 }
 
 void printMotorSpeeds() {
   for (int i = 0; i < 4; i++) {
-    Serial.print(F("S"));
+    Serial.write('D');
     Serial.print(i);
-    Serial.print(F(":"));
+    Serial.write(':');
     Serial.print(speeds[i]);
     printTab();
   }
 }
 
 void printlnPIDk() {
-  Serial.print("Acro: ");
+  Serial.print(F("Acro: "));
   for (int i = 0; i < 9; i++) {
     Serial.print(acroPIDk[i]);
     printTab();
   }
-  Serial.print("Stabilize: ");
+  Serial.print(F("Stabilize: "));
   for (int i = 0; i < 6; i++) {
     Serial.print(stabilizePIDk[i]);
     printTab();
@@ -95,12 +104,12 @@ void printlnPIDk() {
 }
 
 void printPIDk() {
-  Serial.print("Acro: ");
+  Serial.print(F("Acro: "));
   for (int i = 0; i < 9; i++) {
     Serial.print(acroPIDk[i]);
     printTab();
   }
-  Serial.print("Stabilize: ");
+  Serial.print(F("Stabilize: "));
   for (int i = 0; i < 6; i++) {
     Serial.print(stabilizePIDk[i]);
     printTab();
@@ -108,11 +117,14 @@ void printPIDk() {
 }
 
 void printTab() {
-  Serial.print(F("    "));
+  Serial.write(' ');
+  Serial.write(' ');
+  Serial.write(' ');
+  Serial.write(' ');
 }
 
 void printNewLine() {
-  Serial.print(F("\n"));
+  Serial.write(10);
 }
 
 void printBookmark() {
@@ -146,4 +158,21 @@ boolean shouldPrintBookmark() {
     potLastVal = 3;
   }
   return false;
+}
+
+/*Measure input voltage code from here:
+* https://code.google.com/p/tinkerit/wiki/SecretVoltmeter
+*/
+long printVcc() {
+  long result;
+  // Read 1.1V reference against AVcc
+  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  delay(2); // Wait for Vref to settle
+  ADCSRA |= _BV(ADSC); // Convert
+  while (bit_is_set(ADCSRA, ADSC));
+  result = ADCL;
+  result |= ADCH << 8;
+  result = 1126400L / result; // Back-calculate AVcc in mV
+  Serial.write('V');
+  Serial.print(result, DEC);
 }

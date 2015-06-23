@@ -35,12 +35,10 @@ float acroSet[3];
 * (relative to ground) to reach
 */
 float stabilizeSet[2];
-/*Max and min for angular velocity
-*/
+//Max and min for angular velocity
 #define PR_ACRO_MAX 45
 #define YAW_MAX 5
-/*Max and min for inclination
-*/
+//Max and min for inclination
 #define PR_ANGLE_MAX 45
 
 
@@ -55,9 +53,7 @@ float angleOffset[2];
 
 //######PID######
 
-/*Array of PIDs
-* PITCH, ROLL(, YAW)
-*/
+//Array of PIDs PITCH, ROLL(, YAW)
 PIDCont acroPID[3];
 PIDCont stabilizePID[2];
 /*Following costants are
@@ -95,10 +91,8 @@ int speeds[4];
 
 //#####OTHERS#####
 
-/*Kind of stabilization
-* to perform
-*/
 #define ACRO_MODE 0
 #define STABILIZED_MODE 1
-int flightMode = 0;
+int flightMode = ACRO_MODE;
+
 bool showLog = false;

@@ -62,16 +62,16 @@ void setupDMP() {
   }
 }
 
-/*Modified version of the original, that runned
+/*Modified version of the original, that used to run
 * the normal loop just while waiting for new data to arrive
 * Now it is runned after new data received, and a better
-* exception control system has been added to propagate 
+* exception control system has been added to propagate
 * exceptions returning 1 (if everything went right, 0 is
 * returned. This let me add this function just at the
 * beginnig of the flight control, with the needed exception
 * control system.
 */
-int updateIMU() {
+uint8_t updateIMU() {
   // if programming failed, don't try to do anything
   if (!dmpReady) return 1;
 
@@ -89,7 +89,8 @@ int updateIMU() {
   if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
     // reset so we can continue cleanly
     mpu.resetFIFO();
-    Serial.println(F("FIFO overflow!"));
+    Serial.write('!');
+    printNewLine();
     return 1;
   }
   // otherwise, check for DMP data ready interrupt (this should happen frequently)
