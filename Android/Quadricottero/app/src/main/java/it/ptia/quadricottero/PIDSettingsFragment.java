@@ -104,7 +104,8 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
                 for (int i = 0; i < pidEditText.length; i++) {
                     pidEditText[i].setText(valuesArray[i]);
                 }
-                flightModeSpinner.setSelection(Integer.parseInt(newString.split("m")[1]));
+                Log.i(TAG, "M="+newString.split("m")[1]);
+                flightModeSpinner.setSelection(Integer.parseInt(newString.split("m")[1].replaceAll("\\s+", "")));
                 refresher.setRefreshing(false);
                 setEnabled(true);
             }
@@ -121,11 +122,13 @@ public class PIDSettingsFragment extends Fragment implements BluetoothSerial.Com
             String message = "";
             for(int i = 0; i < pidEditText.length; i++) {
                 Integer val = (int) (Float.parseFloat(pidEditText[i].getText().toString()) * 10);
+                bluetoothSerial.print("#"+i+"="+val+"||");
                 message = message.concat("#"+i+"="+val+"||");
             }
+            bluetoothSerial.print("M"+flightModeSpinner.getSelectedItemPosition());
             message = message.concat("M"+flightModeSpinner.getSelectedItemPosition()+"||");
             Log.i(TAG, "sending "+message);
-            bluetoothSerial.print(message);
+            //bluetoothSerial.print(message);
         } catch (IOException e) {
             e.printStackTrace();
             bluetoothSerial.close();

@@ -61,6 +61,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
     public void write(byte b) throws IOException {
         if(isConnected()) {
             outputStream.write(b);
+            outputStream.flush();
         }
         else throw new IOException("Not connected to device");
     }
@@ -68,6 +69,7 @@ public class BluetoothSerial implements BTConnector.OnConnectedListener {
     public void print(String msg) throws IOException {
         if(isConnected()) {
             outputStream.write(msg.getBytes());
+            outputStream.flush();
         }
         else throw new IOException("Not connected to device");
 
