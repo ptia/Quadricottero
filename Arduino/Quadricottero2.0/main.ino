@@ -4,22 +4,19 @@ void setup() {
   setupRX();
   readPIDk();
   armMotors();
-  //Do not start with hight throttle
-  while (!(lowThrottle | throttleLock)) {
-    Serial.println(F("Can't start with high throttle"));
+  //Start only if the throttle lock is enabled
+  while (!throttleLock) {
+    Serial.println(F("Insert the throttle lock to start"));
     readRX();
   }
-  /*Pin 13 is used to notify
-  * the current flight mode
-  */
+  //Pin 13 is used to notify the current flight mode
   pinMode(13, OUTPUT);
   digitalWrite(13, flightMode);
+  Serial.println(F("Launching loop"));
 }
 
 void loop() {
-  /*Read IMU and stop if
-  * there are errors
-  */
+  //Read IMU and stop if there are errors
   if (updateIMU() == 1) {
     return;
   }
@@ -35,4 +32,7 @@ void loop() {
   computePID();
   sendMotorSpeeds();
   log();
+#ifdef LOG_LOOP_SPEED
+  logLoopSpeed();
+#endif
 }

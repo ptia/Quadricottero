@@ -174,5 +174,15 @@ long printVcc() {
   result |= ADCH << 8;
   result = 1126400L / result; // Back-calculate AVcc in mV
   Serial.write('V');
+  Serial.write(' ');
   Serial.print(result, DEC);
 }
+#ifdef LOG_LOOP_SPEED
+long lastLoopMillis;
+void logLoopSpeed() {
+  Serial.write('L');
+  Serial.write('S');
+  Serial.print(millis() - lastLoopMillis);
+  lastLoopMillis = millis();
+}
+#endif

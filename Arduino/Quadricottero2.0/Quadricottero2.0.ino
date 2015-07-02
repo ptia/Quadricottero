@@ -1,11 +1,7 @@
 #include <EEPROM.h>
-
 #include <PCintPulseIn.h>
-
 #include <Servo.h>
-
 #include <PIDCont.h>
-
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -44,9 +40,7 @@ float stabilizeSet[2];
 
 //######IMU######
 
-/*Array of IMU data
-* sorted Pitch-Roll(-Yaw)
-*/
+//Array of IMU data, sorted Pitch-Roll(-Yaw)
 float gyro[3];
 float angle[2];
 float angleOffset[2];
@@ -60,7 +54,7 @@ PIDCont stabilizePID[2];
 * sorted this way:
 * Pitch: P, I, D
 * Roll: P, I, D
-* Yaw: P, I, D
+* (Yaw: P, I, D)
 */
 float acroPIDk[9];
 float stabilizePIDk[6];
@@ -96,3 +90,5 @@ int speeds[4];
 int flightMode = ACRO_MODE;
 
 bool showLog = false;
+
+#define LOG_LOOP_SPEED
