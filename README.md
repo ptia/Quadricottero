@@ -9,7 +9,7 @@ Its main features are:
 * Time-saving, interrupt-driven radio reading
 * Some basic safety features
 
-I personally wrote most of the code, but I used external libraries to interface with the MPU-6050 and wrote my own library for interrupt-driven pulseIn (used to read radio signal) based on PCint Library. The PID library used is from this awesome quadcopter flight controller: https://github.com/baselsw/BlueCopter
+I personally wrote most of the code, but I used external libraries to interface with the MPU-6050 and wrote my own library for interrupt-driven pulseIn (used to read radio signal) based on PCint Library. The PID library used is this one: https://github.com/br3ttb/Arduino-PID-Library/
 
 ###Android app
 Its features are:
