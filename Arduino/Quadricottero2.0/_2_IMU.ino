@@ -71,7 +71,7 @@ void setupDMP() {
 * beginnig of the flight control, with the needed exception
 * control system.
 */
-uint8_t updateIMU() {
+byte updateIMU() {
   // if programming failed, don't try to do anything
   if (!dmpReady) return 1;
 
