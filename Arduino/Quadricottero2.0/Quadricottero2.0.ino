@@ -1,7 +1,8 @@
+#include <PID_v1.h>
+
 #include <EEPROM.h>
 #include <PCintPulseIn.h>
 #include <Servo.h>
-#include <PIDCont.h>
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "Wire.h"
@@ -31,7 +32,7 @@ float acroSet[3];
 float stabilizeSet[2];
 //Max and min for angular velocity
 #define PR_ACRO_MAX 45
-#define YAW_MAX 5
+#define YAW_MAX 10
 //Max and min for inclination
 #define PR_ANGLE_MAX 45
 
@@ -42,20 +43,6 @@ float stabilizeSet[2];
 float gyro[3];
 float angle[2];
 float angleOffset[2];
-
-//######PID######
-
-//Array of PIDs PITCH, ROLL(, YAW)
-PIDCont acroPID[3];
-PIDCont stabilizePID[2];
-/*Following costants are
-* sorted this way:
-* Pitch: P, I, D
-* Roll: P, I, D
-* (Yaw: P, I, D)
-*/
-float acroPIDk[9];
-float stabilizePIDk[6];
 
 
 //#####MOTORS#####
@@ -74,12 +61,35 @@ const int motorPins[] = {3, 4, 5, 6};
 */
 #define MAX_MOTOR_DELTA 100
 //Delta values for PRY
-int rawPRY[3];
+float rawPRY[3];
 
 #define MOTOR_MIN_SPEED 1100
 #define MOTOR_ARM 1000
 //Speeds of single motors
 int speeds[4];
+
+
+//######PID######
+
+/*Following costants are
+* sorted this way:
+* Pitch: P, I, D
+* Roll: P, I, D
+* (Yaw: P, I, D)
+*/
+float acroPIDk[9];
+float stabilizePIDk[6];
+
+//Array of PIDs PITCH, ROLL(, YAW)
+PID acroPID[] = {
+  PID(&gyro[0], &rawPRY[0], &acroSet[0], acroPIDk[0], acroPIDk[1], acroPIDk[2], REVERSE),
+  PID(&gyro[1], &rawPRY[1], &acroSet[1], acroPIDk[3], acroPIDk[4], acroPIDk[5], REVERSE),
+  PID(&gyro[2], &rawPRY[2], &acroSet[2], acroPIDk[6], acroPIDk[7], acroPIDk[8], REVERSE)
+};
+PID stabilizePID[] = {
+  PID(&angle[0], &acroSet[0], &stabilizeSet[0], stabilizePIDk[0], stabilizePIDk[1], stabilizePIDk[2], REVERSE),
+  PID(&angle[1], &acroSet[1], &stabilizeSet[1], stabilizePIDk[3], stabilizePIDk[4], stabilizePIDk[5], REVERSE),
+};
 
 //#####OTHERS#####
 

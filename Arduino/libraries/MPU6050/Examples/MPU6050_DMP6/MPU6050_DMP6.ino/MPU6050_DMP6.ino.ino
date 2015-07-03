@@ -1,7 +1,3 @@
-#include <PCint.h>
-
-#include <PCintRX.h>
-
 // I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
 // 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
 // Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
@@ -174,7 +170,7 @@ void setup() {
     // initialize serial communication
     // (115200 chosen because it is required for Teapot Demo output, but it's
     // really up to you depending on your project)
-    Serial.begin(19200);
+    Serial.begin(115200);
     while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
     // NOTE: 8MHz or slower host processors, like the Teensy @ 3.3v or Ardunio
@@ -233,7 +229,7 @@ void setup() {
         Serial.print(devStatus);
         Serial.println(F(")"));
     }
-    setupRX();
+
     // configure LED for output
     pinMode(LED_PIN, OUTPUT);
 }
@@ -250,9 +246,16 @@ void loop() {
 
     // wait for MPU interrupt or extra packet(s) available
     while (!mpuInterrupt && fifoCount < packetSize) {
-        readRX();
-        Serial.println(RXdata[0]);
-        delay(100);
+        // other program behavior stuff here
+        // .
+        // .
+        // .
+        // if you are really paranoid you can frequently test in between other
+        // stuff to see if mpuInterrupt is true, and if so, "break;" from the
+        // while() loop to immediately process the MPU data
+        // .
+        // .
+        // .
     }
 
     // reset interrupt flag and get INT_STATUS byte
@@ -367,3 +370,4 @@ void loop() {
         digitalWrite(LED_PIN, blinkState);
     }
 }
+
