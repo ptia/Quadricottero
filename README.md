@@ -1,6 +1,6 @@
 ## Quadricottero - An Arduino quadcopter with an Android client
 
-Quadricottero is an Arduino-based quadcopter flight controller. 
+###Arduino sketch
 Its main features are:
 * Acrobatic and stabilized flight mode
 * Serial (bluetooth) settings manager for enabling log, changing PID constants, and so on
@@ -11,7 +11,8 @@ Its main features are:
 
 I personally wrote most of the code, but I used external libraries to interface with the MPU-6050 and wrote my own library for interrupt-driven pulseIn (used to read radio signal) based on PCint Library. The PID library used is from this awesome quadcopter flight controller: https://github.com/baselsw/BlueCopter
 
-The Android client is currently being developed. Its features are:
+###Android app
+Its features are:
 * Basic serial terminal (send and receive data)
 * Quadcopter log save in .txt files
 * Graphic and easy to use remote settings manager to edit PID constants and change flight mode
