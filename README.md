@@ -24,14 +24,14 @@ This is its to-do list (sorted by predicted priority and ease):
 The code is mainly written by me, but it is based on this stackoverflow answer: http://stackoverflow.com/questions/10327506/android-arduino-bluetooth-data-transfer
 
 ##Components used
-The hole project is ment to be as DIY and cheap as possible
+The whole project is ment to be as DIY and cheap as possible.
 
-###Controller electronics
+Controller electronics:
 * Original Arduino UNO
 * 6 channels radio controller and receiver €21.34: http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=9042
 * 6 axis IMU (MPU-6050) €5.00: http://www.ebay.it/itm/Modulo-GY-521-con-MPU-6050-Giroscopio-Accelerometro-3-assi-Arduino-6-DOF-MPU6050-/171075512717?pt=LH_DefaultDomain_101&hash=item27d4e5298d#shpCntId
 
-###Power electronics, propellers and frame
+Power electronics, propellers and frame:
 * Kit of motors, propellers and frame €33.71: http://hobbyking.com/hobbyking/store/__28592__ST360_Quadcopter_Frame_w_Motors_and_Propellers_360mm.html
 * Motor controller €25.43: http://www.hobbyking.com/hobbyking/store/__36674__q_brain_4_x_20a_brushless_quadcopter_esc_2_4s_3a_sbec.html
 * Battery €11.48: http://www.hobbyking.com/hobbyking/store/__9394__Turnigy_2200mAh_3S_30C_Lipo_Pack.html?strSearch=Turnigy%202200mAh%203S%2030C%20Lipo%20Pa
