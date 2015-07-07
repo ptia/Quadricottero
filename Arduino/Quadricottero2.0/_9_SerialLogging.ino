@@ -16,6 +16,9 @@ void log() {
       printRawPRY();
     }
     printVcc();
+#ifdef LOG_LOOP_SPEED
+    logLoopSpeed();
+#endif
     printNewLine();
   }
 }
@@ -177,6 +180,7 @@ long printVcc() {
   Serial.write(' ');
   Serial.print(result, DEC);
 }
+
 #ifdef LOG_LOOP_SPEED
 long lastLoopMillis;
 void logLoopSpeed() {

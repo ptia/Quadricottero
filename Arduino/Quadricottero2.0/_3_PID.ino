@@ -18,21 +18,13 @@ void setPIDk() {
 }
 
 void computePID() {
-  if (lowThrottle) {
-    //If throttle is low, do not apply any Pitch Roll or Yaw
-    rawPRY[0] = 0;
-    rawPRY[1] = 0;
-    rawPRY[2] = 0;
-    return;
-  }
   if (flightMode == STABILIZED_MODE) {
     //Compute angular velocities from stabilized PID
-    for (int i = 0; i < 2; i++) {
-      stabilizePID[i].Compute();
-    }
+    stabilizePID[0].Compute();
+    stabilizePID[1].Compute();
   }
   //Compute motor delta values from acro PID
-  for (int i = 0; i < 3; i++) {
-    acroPID[i].Compute();
-  }
+  stabilizePID[0].Compute();
+  stabilizePID[1].Compute();
+  stabilizePID[2].Compute();
 }

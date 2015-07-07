@@ -29,10 +29,13 @@ void loop() {
     }
     return;
   }
-  computePID();
+  if(lowThrottle) {
+    //Do not apply PID
+    sendToMotors(throttle);
+  }
+  else {
+    computePID();
+  }
   sendMotorSpeeds();
   log();
-#ifdef LOG_LOOP_SPEED
-  logLoopSpeed();
-#endif
 }
