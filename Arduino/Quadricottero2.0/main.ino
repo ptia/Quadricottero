@@ -31,7 +31,9 @@ void loop() {
   }
   if(lowThrottle) {
     //Do not apply PID
-    sendToMotors(throttle);
+    rawPRY[0] = 0;
+    rawPRY[1] = 0;
+    rawPRY[2] = 0;
   }
   else {
     computePID();

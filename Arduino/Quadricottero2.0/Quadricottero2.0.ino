@@ -81,13 +81,13 @@ float stabilizePIDk[6];
 
 //Array of PIDs PITCH, ROLL(, YAW)
 PID acroPID[] = {
-  PID(&gyro[0], &rawPRY[0], &acroSet[0], acroPIDk[0], acroPIDk[1], acroPIDk[2], REVERSE),
-  PID(&gyro[1], &rawPRY[1], &acroSet[1], acroPIDk[3], acroPIDk[4], acroPIDk[5], REVERSE),
-  PID(&gyro[2], &rawPRY[2], &acroSet[2], acroPIDk[6], acroPIDk[7], acroPIDk[8], REVERSE)
+  PID(acroPIDk[0], acroPIDk[1], acroPIDk[2], REVERSE),
+  PID(acroPIDk[3], acroPIDk[4], acroPIDk[5], REVERSE),
+  PID(acroPIDk[6], acroPIDk[7], acroPIDk[8], REVERSE)
 };
 PID stabilizePID[] = {
-  PID(&angle[0], &acroSet[0], &stabilizeSet[0], stabilizePIDk[0], stabilizePIDk[1], stabilizePIDk[2], REVERSE),
-  PID(&angle[1], &acroSet[1], &stabilizeSet[1], stabilizePIDk[3], stabilizePIDk[4], stabilizePIDk[5], REVERSE),
+  PID(stabilizePIDk[0], stabilizePIDk[1], stabilizePIDk[2], REVERSE),
+  PID(stabilizePIDk[3], stabilizePIDk[4], stabilizePIDk[5], REVERSE),
 };
 
 //#####OTHERS#####
