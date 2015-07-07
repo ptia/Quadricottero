@@ -15,12 +15,11 @@ class PID
   #define REVERSE  1
 
   //commonly used functions **************************************************************************
-    PID(float*, float*, float*,        // * constructor.  links the PID to the Input, Output, and 
-        float, float, float, int);     //   Setpoint.  Initial tuning parameters are also set here
+    PID(float, float, float, int);     //   Setpoint.  Initial tuning parameters are also set here
 	
     void SetMode(int Mode);               // * sets PID to either Manual (0) or Auto (non-0)
 
-    bool Compute();                       // * performs the PID calculation.  it should be
+    float Compute(float, float);  // * performs the PID calculation.  it should be
                                           //   called every time loop() cycles. ON/OFF and
                                           //   calculation frequency can be set using SetMode
                                           //   SetSampleTime respectively
