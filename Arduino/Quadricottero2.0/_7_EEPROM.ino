@@ -16,11 +16,11 @@ void readPIDk() {
 void savePIDk() {
   uint8_t addr = PID_K_FIRST_ADDR;
   for (int i = 0; i < 9; i++) {
-    EEPROM.write(addr, (uint8_t)(acroPIDk[i] * 10));
+    EEPROM.write(addr, acroPIDk[i]);
     addr++;
   }
   for (int i = 0; i < 6; i++) {
-    EEPROM.write(addr, (uint8_t)(stabilizePIDk[i] * 10));
+    EEPROM.write(addr, stabilizePIDk[i]);
     addr++;
   }
 }

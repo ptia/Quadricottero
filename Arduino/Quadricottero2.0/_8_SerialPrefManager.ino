@@ -30,7 +30,8 @@ void PIDprefManager(char newByte) {
   int pidElement;
   if (newByte == 'S') {
     savePIDk();
-    printlnPIDk();
+    printPIDk();
+    printNewLine();
     Serial.println(F("Saved"));
     return;
   }
@@ -41,10 +42,10 @@ void PIDprefManager(char newByte) {
 
   if (Serial.read() == '=') {
     if (pidElement < 9) {
-      acroPIDk[pidElement] = (float) Serial.parseInt() / 10.0;
+      acroPIDk[pidElement] = Serial.parseInt();
     }
     else {
-      stabilizePIDk[pidElement - 9] = (float) Serial.parseInt() / 10.0;
+      stabilizePIDk[pidElement - 9] = Serial.parseInt();
     }
     setPIDk();
   }

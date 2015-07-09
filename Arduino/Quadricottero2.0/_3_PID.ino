@@ -1,21 +1,21 @@
 void setPIDk() {
   //Stabilized PID
-  for (byte i = 0; i < 2; i++) {
-    float pk = ((float)stabilizePIDk[i * 3]) / 10.0;
-    float ik = ((float)stabilizePIDk[i * 3 + 1]) / 10.0;
-    float dk = ((float)stabilizePIDk[i * 3 + 2]) / 10.0;
+  for (int i = 0; i < 2; i++) {
+    float pk = divideByTen(stabilizePIDk[i * 3]);
+    float ik = divideByTen(stabilizePIDk[i * 3 + 1]);
+    float dk = divideByTen(stabilizePIDk[i * 3 + 2]);
     stabilizePID[i].SetTunings(pk, ik, dk);
     stabilizePID[i].SetOutputLimits(-PR_ACRO_MAX, PR_ACRO_MAX);
     stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
   //Acro PID
-  for (byte i = 0; i < 3; i++) {
-    float pk = ((float)acroPIDk[i * 3]) / 10.0;
-    float ik = ((float)acroPIDk[i * 3 + 1]) / 10.0;
-    float dk = ((float)acroPIDk[i * 3 + 2]) / 10.0;
+  for (int i = 0; i < 3; i++) {
+    float pk = divideByTen(acroPIDk[i * 3]);
+    float ik = divideByTen(acroPIDk[i * 3 + 1]);
+    float dk = divideByTen(acroPIDk[i * 3 + 2]);
     acroPID[i].SetTunings(pk, ik, dk);
     acroPID[i].SetOutputLimits(-MAX_MOTOR_DELTA, MAX_MOTOR_DELTA);
-    stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
+    acroPID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
 }
 
@@ -30,3 +30,8 @@ void computePID() {
   rawPRY[1] = acroPID[1].Compute(gyro[1], acroSet[1]);
   rawPRY[2] = acroPID[2].Compute(gyro[3], acroSet[2]);
 }
+
+float divideByTen(int n) {
+  return ((float)n) / 10.0;
+}
+

@@ -98,29 +98,23 @@ void printMotorSpeeds() {
   }
 }
 
-void printlnPIDk() {
-  Serial.print(F("Acro: "));
-  for (int i = 0; i < 9; i++) {
-    Serial.print(acroPIDk[i]);
-    printTab();
-  }
-  Serial.print(F("Stabilize: "));
-  for (int i = 0; i < 6; i++) {
-    Serial.print(stabilizePIDk[i]);
-    printTab();
-  }
-  printNewLine();
-}
-
 void printPIDk() {
   Serial.print(F("Acro: "));
-  for (int i = 0; i < 9; i++) {
-    Serial.print(acroPIDk[i]);
+  for (int i = 0; i < 3; i++) {
+    Serial.print(acroPID[i].GetKp());
+    printTab();
+    Serial.print(acroPID[i].GetKi());
+    printTab();
+    Serial.print(acroPID[i].GetKd());
     printTab();
   }
   Serial.print(F("Stabilize: "));
-  for (int i = 0; i < 6; i++) {
-    Serial.print(stabilizePIDk[i]);
+  for (int i = 0; i < 2; i++) {
+    Serial.print(stabilizePID[i].GetKp());
+    printTab();
+    Serial.print(stabilizePID[i].GetKi());
+    printTab();
+    Serial.print(stabilizePID[i].GetKd());
     printTab();
   }
 }
@@ -186,16 +180,6 @@ long printVcc() {
   Serial.write(' ');
   Serial.print(result, DEC);
 }
-
-int printFreeRam () {
-  extern int __heap_start, *__brkval;
-  int v;
-  int freeRam =  (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-  Serial.write('F');
-  Serial.write('R');
-  Serial.println(freeRam);
-}
-
 
 #ifdef LOG_LOOP_SPEED
 unsigned long lastLoopMillis;

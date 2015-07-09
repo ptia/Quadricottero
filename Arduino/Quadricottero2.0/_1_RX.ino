@@ -18,9 +18,9 @@ void readRX() {
 }
 
 void setupRX() {
-  byte channelCount = sizeof(RXpins) / sizeof(int);
-  for (byte i = 0; i < channelCount; i++) {
-    byte pin = RXpins[i];
+  int channelCount = sizeof(RXpins) / sizeof(int);
+  for (int i = 0; i < channelCount; i++) {
+    int pin = RXpins[i];
     Serial.println(pin);
     pinMode(pin, INPUT);
     attachPulseIn(pin);
