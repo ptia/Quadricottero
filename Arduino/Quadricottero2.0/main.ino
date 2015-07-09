@@ -5,7 +5,7 @@ void setup() {
   readPIDk();
   armMotors();
   //Start only if the throttle lock is enabled
-  while (throttle!=THROTTLE_LOCK) {
+  while (throttle != THROTTLE_LOCK) {
     Serial.println(F("Insert the throttle lock to start"));
     readRX();
   }
@@ -21,7 +21,7 @@ void loop() {
     return;
   }
   readRX();
-  if (throttle==THROTTLE_LOCK) {
+  if (throttle == THROTTLE_LOCK) {
     sendToMotors(MOTOR_MIN_SPEED);
     readSerialPreferences();
     if (shouldPrintBookmark()) {
@@ -30,7 +30,7 @@ void loop() {
     printFreeRam();
     return;
   }
-  if(throttle==LOW_THROTTLE) {
+  if (throttle == LOW_THROTTLE) {
     //Do not apply PID
     rawPRY[0] = 0;
     rawPRY[1] = 0;

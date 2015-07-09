@@ -1,19 +1,19 @@
 void setPIDk() {
   //Stabilized PID
-  for (int i = 0; i < 2; i++) {
-    float pk = stabilizePIDk[i * 3];
-    float ik = stabilizePIDk[i * 3 + 1];
-    float dk = stabilizePIDk[i * 3 + 2];
+  for (byte i = 0; i < 2; i++) {
+    float pk = ((float)stabilizePIDk[i * 3]) / 10.0;
+    float ik = ((float)stabilizePIDk[i * 3 + 1]) / 10.0;
+    float dk = ((float)stabilizePIDk[i * 3 + 2]) / 10.0;
     stabilizePID[i].SetTunings(pk, ik, dk);
     stabilizePID[i].SetOutputLimits(-PR_ACRO_MAX, PR_ACRO_MAX);
     stabilizePID[i].SetMode(AUTOMATIC);
     stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
   //Acro PID
-  for (int i = 0; i < 3; i++) {
-    float pk = acroPIDk[i * 3];
-    float ik = acroPIDk[i * 3 + 1];
-    float dk = acroPIDk[i * 3 + 2];
+  for (byte i = 0; i < 3; i++) {
+    float pk = ((float)acroPIDk[i * 3]) / 10.0;
+    float ik = ((float)acroPIDk[i * 3 + 1]) / 10.0;
+    float dk = ((float)acroPIDk[i * 3 + 2]) / 10.0;
     acroPID[i].SetTunings(pk, ik, dk);
     acroPID[i].SetOutputLimits(-MAX_MOTOR_DELTA, MAX_MOTOR_DELTA);
     acroPID[i].SetMode(AUTOMATIC);

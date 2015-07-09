@@ -1,7 +1,7 @@
 void log() {
   if (showLog) {
     printThrottle();
-    if (throttle!=THROTTLE_LOCK) {
+    if (throttle != THROTTLE_LOCK) {
       printTab();
       if (flightMode == STABILIZED_MODE) {
         printStabilizeSet();

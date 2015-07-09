@@ -77,8 +77,8 @@ int speeds[4];
 * Roll: P, I, D
 * (Yaw: P, I, D)
 */
-float acroPIDk[9];
-float stabilizePIDk[6];
+int acroPIDk[9];
+int stabilizePIDk[6];
 #define PID_SAMPLE_TIME 55 //ms
 
 //Array of PIDs PITCH, ROLL(, YAW)
