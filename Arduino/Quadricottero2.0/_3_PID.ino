@@ -6,7 +6,6 @@ void setPIDk() {
     float dk = ((float)stabilizePIDk[i * 3 + 2]) / 10.0;
     stabilizePID[i].SetTunings(pk, ik, dk);
     stabilizePID[i].SetOutputLimits(-PR_ACRO_MAX, PR_ACRO_MAX);
-    stabilizePID[i].SetMode(AUTOMATIC);
     stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
   //Acro PID
@@ -16,7 +15,7 @@ void setPIDk() {
     float dk = ((float)acroPIDk[i * 3 + 2]) / 10.0;
     acroPID[i].SetTunings(pk, ik, dk);
     acroPID[i].SetOutputLimits(-MAX_MOTOR_DELTA, MAX_MOTOR_DELTA);
-    acroPID[i].SetMode(AUTOMATIC);
+    stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
 }
 

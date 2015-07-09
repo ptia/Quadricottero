@@ -19,10 +19,8 @@
  ***************************************************************************/
 PID::PID(float Kp, float Ki, float Kd, int ControllerDirection)
 {
-  inAuto = false;
-
-  PID::SetOutputLimits(0, 255);       //default output limit corresponds to
-  //the arduino pwm limits
+	//default output limit corresponds to the arduino pwm limits
+  PID::SetOutputLimits(0, 255);       
 
   SampleTime = 100;             //default Controller Sample Time is 0.1 seconds
 
@@ -41,16 +39,12 @@ PID::PID(float Kp, float Ki, float Kd, int ControllerDirection)
  **********************************************************************************/
 float PID::Compute(float input, float setpoint)
 {
-	//Serial.print(inAuto);
-  if (!inAuto) return 0;
   unsigned long now = millis();
-  unsigned long timeChange = (now - lastTime);
+  unsigned int timeChange = (now - lastTime);
   if (timeChange >= SampleTime)
   {
     /*Compute all the working error variables*/
     float error = setpoint - input;
-    //Serial.write('E');
-    //Serial.print(error);
     ITerm += (ki * error);
     if (ITerm > outMax) ITerm = outMax;
     else if (ITerm < outMin) ITerm = outMin;
@@ -124,36 +118,6 @@ void PID::SetOutputLimits(float Min, float Max)
   if (Min >= Max) return;
   outMin = Min;
   outMax = Max;
-
-  if (inAuto)
-  {
-    if (ITerm > outMax) ITerm = outMax;
-    else if (ITerm < outMin) ITerm = outMin;
-  }
-}
-
-/* SetMode(...)****************************************************************
- * Allows the controller Mode to be set to manual (0) or Automatic (non-zero)
- * when the transition from manual to auto occurs, the controller is
- * automatically initialized
- ******************************************************************************/
-void PID::SetMode(int Mode)
-{
-  bool newAuto = (Mode == AUTOMATIC);
-  if (newAuto == !inAuto)
-  { /*we just went from manual to auto*/
-    PID::Initialize();
-  }
-  inAuto = newAuto;
-}
-
-/* Initialize()****************************************************************
- *  does all the things that need to happen to ensure a bumpless transfer
- *  from manual to automatic mode.
- ******************************************************************************/
-void PID::Initialize()
-{
-  ITerm = lastOutput;
   if (ITerm > outMax) ITerm = outMax;
   else if (ITerm < outMin) ITerm = outMin;
 }
@@ -166,7 +130,7 @@ void PID::Initialize()
  ******************************************************************************/
 void PID::SetControllerDirection(int Direction)
 {
-  if (inAuto && Direction != controllerDirection)
+  if (Direction != controllerDirection)
   {
     kp = (0 - kp);
     ki = (0 - ki);
@@ -188,9 +152,6 @@ float PID::GetKi() {
 }
 float PID::GetKd() {
   return  dispKd;
-}
-int PID::GetMode() {
-  return  inAuto ? AUTOMATIC : MANUAL;
 }
 int PID::GetDirection() {
   return controllerDirection;
