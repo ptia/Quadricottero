@@ -12,10 +12,10 @@
 * always sorted this way:
 * THROTTLE, PITCH, ROLL, YAW, POT_A
 */
-const int RXpins[] = {A0, A1, A2, A3, 8};
-const int signalMin[] = {1172, 1176, 1160, 1132, 2008};
-const int signalMax[] = {1816, 1816, 1944, 1940, 996};
-int16_t throttle;
+const byte RXpins[] = {A0, A1, A2, A3, 8};
+const unsigned int signalMin[] = {1172, 1176, 1160, 1132, 2008};
+const unsigned int signalMax[] = {1816, 1816, 1944, 1940, 996};
+int throttle;
 bool throttleLock, lowThrottle;
 #define THROTTLE_MAX 1000
 
@@ -95,8 +95,7 @@ PID stabilizePID[] = {
 
 #define ACRO_MODE 0
 #define STABILIZED_MODE 1
-int flightMode = ACRO_MODE;
+byte flightMode = ACRO_MODE;
 
-bool showLog = false;
-
+byte showLog = false;
 //#define LOG_LOOP_SPEED
