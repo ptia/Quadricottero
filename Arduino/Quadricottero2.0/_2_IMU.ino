@@ -124,8 +124,8 @@ byte updateIMU() {
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
     //Oddly, pitch and roll are inverted here
-    angle[0] = angleOffset[0] - (ypr[2] * 180 / M_PI);
-    angle[1] = angleOffset[1] + (ypr[1] * 180 / M_PI) - 2.09;
+    angle[0] = -angleOffset[0] - (ypr[2] * 180 / M_PI);
+    angle[1] = -angleOffset[1] + (ypr[1] * 180 / M_PI) - 2.09;
   }
   return 0;
 }
