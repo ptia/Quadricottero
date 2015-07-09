@@ -16,7 +16,8 @@ const byte RXpins[] = {A0, A1, A2, A3, 8};
 const unsigned int signalMin[] = {1172, 1176, 1160, 1132, 2008};
 const unsigned int signalMax[] = {1816, 1816, 1944, 1940, 996};
 int throttle;
-bool throttleLock, lowThrottle;
+#define LOW_THROTTLE -1000
+#define THROTTLE_LOCK -1001
 #define THROTTLE_MAX 1000
 
 //###SETPOINTS###

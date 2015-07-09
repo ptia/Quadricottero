@@ -1,12 +1,10 @@
 void readRX() {
-  throttleLock = false;
-  lowThrottle = false;
   throttle = map(PCintPulseIn(RXpins[0]), signalMin[0], signalMax[0], 0, THROTTLE_MAX);
   if (throttle < -100) {
-    throttleLock = true;
+    throttle = THROTTLE_LOCK;
   }
   else if (throttle < 20) {
-    lowThrottle = true;
+    throttle = LOW_THROTTLE;
   }
   if (flightMode == ACRO_MODE) {
     acroSet[0] = map(PCintPulseIn(RXpins[1]), signalMin[1], signalMax[1], -PR_ACRO_MAX, PR_ACRO_MAX);
