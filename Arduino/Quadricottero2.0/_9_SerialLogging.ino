@@ -21,6 +21,12 @@ void log() {
 #endif
     printNewLine();
   }
+  else {
+#ifdef LOG_LOOP_SPEED
+    logLoopSpeed();
+    printNewLine();
+#endif
+  }
 }
 
 void printThrottle() {
@@ -181,8 +187,18 @@ long printVcc() {
   Serial.print(result, DEC);
 }
 
+int printFreeRam () {
+  extern int __heap_start, *__brkval;
+  int v;
+  int freeRam =  (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+  Serial.write('F');
+  Serial.write('R');
+  Serial.println(freeRam);
+}
+
+
 #ifdef LOG_LOOP_SPEED
-long lastLoopMillis;
+unsigned long lastLoopMillis;
 void logLoopSpeed() {
   Serial.write('L');
   Serial.write('S');

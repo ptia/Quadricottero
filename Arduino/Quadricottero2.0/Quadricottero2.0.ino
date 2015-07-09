@@ -60,7 +60,7 @@ const int motorPins[] = {3, 4, 5, 6};
 */
 #define MAX_MOTOR_DELTA 100
 //Delta values for PRY
-float rawPRY[3];
+int rawPRY[3];
 
 #define MOTOR_MIN_SPEED 1100
 #define MOTOR_ARM 1000
@@ -78,16 +78,17 @@ int speeds[4];
 */
 float acroPIDk[9];
 float stabilizePIDk[6];
+#define PID_SAMPLE_TIME 55 //ms
 
 //Array of PIDs PITCH, ROLL(, YAW)
 PID acroPID[] = {
-  PID(acroPIDk[0], acroPIDk[1], acroPIDk[2], REVERSE),
-  PID(acroPIDk[3], acroPIDk[4], acroPIDk[5], REVERSE),
-  PID(acroPIDk[6], acroPIDk[7], acroPIDk[8], REVERSE)
+  PID(acroPIDk[0], acroPIDk[1], acroPIDk[2], DIRECT),
+  PID(acroPIDk[3], acroPIDk[4], acroPIDk[5], DIRECT),
+  PID(acroPIDk[6], acroPIDk[7], acroPIDk[8], DIRECT)
 };
 PID stabilizePID[] = {
-  PID(stabilizePIDk[0], stabilizePIDk[1], stabilizePIDk[2], REVERSE),
-  PID(stabilizePIDk[3], stabilizePIDk[4], stabilizePIDk[5], REVERSE),
+  PID(stabilizePIDk[0], stabilizePIDk[1], stabilizePIDk[2], DIRECT),
+  PID(stabilizePIDk[3], stabilizePIDk[4], stabilizePIDk[5], DIRECT),
 };
 
 //#####OTHERS#####

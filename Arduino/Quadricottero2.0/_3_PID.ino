@@ -7,6 +7,7 @@ void setPIDk() {
     stabilizePID[i].SetTunings(pk, ik, dk);
     stabilizePID[i].SetOutputLimits(-PR_ACRO_MAX, PR_ACRO_MAX);
     stabilizePID[i].SetMode(AUTOMATIC);
+    stabilizePID[i].SetSampleTime(PID_SAMPLE_TIME);
   }
   //Acro PID
   for (int i = 0; i < 3; i++) {

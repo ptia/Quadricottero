@@ -27,6 +27,7 @@ void loop() {
     if (shouldPrintBookmark()) {
       printBookmark();
     }
+    printFreeRam();
     return;
   }
   if(lowThrottle) {
