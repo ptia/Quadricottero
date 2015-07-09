@@ -41,7 +41,7 @@ PID::PID(float Kp, float Ki, float Kd, int ControllerDirection)
  **********************************************************************************/
 float PID::Compute(float input, float setpoint)
 {
-	Serial.print(inAuto);
+	//Serial.print(inAuto);
   if (!inAuto) return 0;
   unsigned long now = millis();
   unsigned long timeChange = (now - lastTime);
@@ -49,8 +49,8 @@ float PID::Compute(float input, float setpoint)
   {
     /*Compute all the working error variables*/
     float error = setpoint - input;
-    Serial.write('E');
-    Serial.print(error);
+    //Serial.write('E');
+    //Serial.print(error);
     ITerm += (ki * error);
     if (ITerm > outMax) ITerm = outMax;
     else if (ITerm < outMin) ITerm = outMin;
@@ -65,9 +65,10 @@ float PID::Compute(float input, float setpoint)
     /*Remember some variables for next time*/
     lastInput = input;
     lastTime = now;
+    lastOutput = output;
     return output;
   }
-  return 0;
+  return lastOutput;
 }
 
 
@@ -126,9 +127,6 @@ void PID::SetOutputLimits(float Min, float Max)
 
   if (inAuto)
   {
-    if (*myOutput > outMax) *myOutput = outMax;
-    else if (*myOutput < outMin) *myOutput = outMin;
-
     if (ITerm > outMax) ITerm = outMax;
     else if (ITerm < outMin) ITerm = outMin;
   }
@@ -155,7 +153,7 @@ void PID::SetMode(int Mode)
  ******************************************************************************/
 void PID::Initialize()
 {
-  ITerm = *myOutput;
+  ITerm = lastOutput;
   lastInput = *myInput;
   if (ITerm > outMax) ITerm = outMax;
   else if (ITerm < outMin) ITerm = outMin;

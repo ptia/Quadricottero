@@ -65,9 +65,10 @@ float PID::Compute(float input, float setpoint)
     /*Remember some variables for next time*/
     lastInput = input;
     lastTime = now;
+    lastOutput = output;
     return output;
   }
-  return 0;
+  return lastOutput;
 }
 
 
@@ -126,9 +127,6 @@ void PID::SetOutputLimits(float Min, float Max)
 
   if (inAuto)
   {
-    if (*myOutput > outMax) *myOutput = outMax;
-    else if (*myOutput < outMin) *myOutput = outMin;
-
     if (ITerm > outMax) ITerm = outMax;
     else if (ITerm < outMin) ITerm = outMin;
   }
@@ -155,8 +153,7 @@ void PID::SetMode(int Mode)
  ******************************************************************************/
 void PID::Initialize()
 {
-  ITerm = *myOutput;
-  lastInput = *myInput;
+  ITerm = lastOutput;
   if (ITerm > outMax) ITerm = outMax;
   else if (ITerm < outMin) ITerm = outMin;
 }
