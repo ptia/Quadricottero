@@ -1,6 +1,6 @@
 # Quadricottero - An Arduino quadcopter with an Android client
 
-##Arduino sketch
+## Arduino sketch
 Its main features are:
 * Acrobatic and stabilized flight mode
 * Serial (bluetooth) settings manager for enabling log, changing PID constants, and so on
@@ -11,7 +11,7 @@ Its main features are:
 
 I personally wrote most of the code, but I used external libraries to interface with the MPU-6050 and wrote my own library for interrupt-driven pulseIn (used to read radio signal) based on PCint Library. The PID library used is this one: https://github.com/br3ttb/Arduino-PID-Library/
 
-##Android app
+## Android app
 Its features are:
 * Basic serial terminal (send and receive data)
 * Quadcopter log save in .txt files
